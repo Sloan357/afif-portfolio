@@ -1,5 +1,5 @@
 import { SectionEyebrow } from "@/components/atoms/SectionEyebrow";
-import { ProjectCard } from "@/components/molecules/ProjectCard";
+import { FeaturedProjectGrid } from "@/components/molecules/FeaturedProjectGrid";
 import { featuredProjectsData } from "@/data/projects";
 
 export function FeaturedProjects() {
@@ -20,11 +20,7 @@ export function FeaturedProjects() {
         </p>
       </div>
 
-      <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {featuredProjectsData.projects.map((project) => (
-          <ProjectCard key={project.title} project={project} />
-        ))}
-      </div>
+      <FeaturedProjectGrid projects={featuredProjectsData.projects} />
     </section>
   );
 }

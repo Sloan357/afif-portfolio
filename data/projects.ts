@@ -21,6 +21,7 @@ export type FeaturedProject = {
   subtitle: string;
   description: string;
   type: string;
+  categories: string[];
   coverImage: ProjectImage | null;
   galleryImages: ProjectImage[];
   stack: string[];
@@ -55,6 +56,7 @@ export const featuredProjectsData: FeaturedProjectsData = {
       description:
         "Informative website with CMS-managed product pages and a modern product-focused frontend for presenting collections clearly.",
       type: "Product website",
+      categories: ["CMS", "Backend"],
       coverImage: {
         src: null,
         alt: "Nam House of Sleep project preview",
@@ -92,6 +94,7 @@ export const featuredProjectsData: FeaturedProjectsData = {
       description:
         "AI-powered sourcing and workflow automation platform focused on scalable architecture and intelligent operational flows.",
       type: "AI platform",
+      categories: ["AI", "Backend"],
       coverImage: {
         src: null,
         alt: "AI Sourcing Platform project preview",
@@ -130,6 +133,7 @@ export const featuredProjectsData: FeaturedProjectsData = {
       description:
         "Mobile app for pantry management, grocery lists, recipes, and realtime household collaboration across shared accounts.",
       type: "Mobile application",
+      categories: ["Mobile", "Backend"],
       coverImage: {
         src: null,
         alt: "Household Manager App project preview",
