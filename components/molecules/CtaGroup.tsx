@@ -7,7 +7,7 @@ type CtaGroupProps = {
 
 export function CtaGroup({ ctas }: CtaGroupProps) {
   return (
-    <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+    <div className="mt-8 flex flex-col gap-3 sm:flex-row lg:mt-10">
       {ctas.map((cta) => (
         <CtaLink
           key={cta.href}
