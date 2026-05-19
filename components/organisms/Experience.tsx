@@ -28,7 +28,7 @@ export function Experience() {
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="relative space-y-5 before:absolute before:bottom-6 before:left-3 before:top-6 before:w-px before:bg-gradient-to-b before:from-cyan-200/30 before:via-white/10 before:to-transparent">
           {experienceData.experiences.map((experience) => (
             <ExperienceCard
               key={`${experience.role}-${experience.period}`}
