@@ -11,7 +11,7 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
       <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/25 to-transparent" />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_0%,rgba(14,165,233,0.08),transparent_32%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent_44%)]" />
 
-      <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[220px_minmax(0,1fr)]">
+      <div className="flex flex-col gap-6 xl:grid xl:grid-cols-[220px_minmax(0,1fr)]">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200/70">
             {experience.period}

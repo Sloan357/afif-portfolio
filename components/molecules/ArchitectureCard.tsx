@@ -8,7 +8,7 @@ type ArchitectureCardProps = {
 export function ArchitectureCard({ architecture }: ArchitectureCardProps) {
   return (
     <div className="hidden md:block md:max-w-3xl xl:max-w-none">
-      <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#08090d]/85 p-6 shadow-2xl shadow-black/45 backdrop-blur">
+      <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#08090d]/85 p-5 shadow-2xl shadow-black/45 backdrop-blur lg:p-6">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(14,165,233,0.13),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.045),transparent_34%)]" />
         <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/35 to-transparent" />
 
@@ -27,7 +27,7 @@ export function ArchitectureCard({ architecture }: ArchitectureCardProps) {
             </div>
           </div>
 
-          <div className="mt-9 rounded-2xl border border-white/10 bg-black/20 p-4">
+          <div className="mt-9 rounded-2xl border border-white/10 bg-black/20 p-3 lg:p-4">
             <div className="grid grid-cols-2 gap-3">
               {architecture.clients.map((client) => (
                 <div
@@ -56,7 +56,7 @@ export function ArchitectureCard({ architecture }: ArchitectureCardProps) {
                 </div>
               </div>
 
-              <div className="mt-4 grid grid-cols-3 gap-2">
+              <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
                 {architecture.core.services.map((service) => (
                   <ArchitectureItem
                     key={service.label}
