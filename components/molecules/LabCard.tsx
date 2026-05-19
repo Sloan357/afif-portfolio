@@ -1,3 +1,4 @@
+import { ProjectPreview } from "@/components/atoms/ProjectPreview";
 import { TechTag } from "@/components/atoms/TechTag";
 import { TextLink } from "@/components/atoms/TextLink";
 import type { LabsData } from "@/data/labs";
@@ -13,6 +14,8 @@ export function LabCard({ lab }: LabCardProps) {
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_0%,rgba(14,165,233,0.1),transparent_32%),linear-gradient(180deg,rgba(255,255,255,0.035),transparent_42%)]" />
 
       <div className="flex min-h-full flex-col">
+        <ProjectPreview image={lab.coverImage} label={lab.title} />
+
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200/70">
             {lab.type}
