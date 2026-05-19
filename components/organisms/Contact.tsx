@@ -15,7 +15,7 @@ export function Contact() {
         <div className="absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/35 to-transparent" />
 
         <SectionEyebrow>{contactData.eyebrow}</SectionEyebrow>
-        <h2 className="mx-auto mt-5 max-w-4xl text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl md:text-6xl">
+        <h2 className="mx-auto mt-5 max-w-4xl text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl md:text-5xl lg:text-6xl">
           {contactData.title}
         </h2>
         <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-neutral-300 sm:text-lg">
