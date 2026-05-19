@@ -23,7 +23,9 @@ export function Navigation() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 lg:px-8">
       <nav
-        className={`mx-auto max-w-7xl rounded-full border px-4 py-3 transition md:px-5 ${
+        className={`mx-auto max-w-7xl border px-4 py-3 transition md:rounded-full md:px-5 ${
+          isMenuOpen ? "rounded-3xl" : "rounded-full"
+        } ${
           isScrolled || isMenuOpen
             ? "border-white/10 bg-[#050608]/75 shadow-2xl shadow-black/30 backdrop-blur-xl"
             : "border-transparent bg-transparent"
@@ -52,8 +54,8 @@ export function Navigation() {
         </div>
 
         {isMenuOpen ? (
-          <div className="mt-4 border-t border-white/10 px-1 pb-2 pt-4 md:hidden">
-            <div className="flex flex-col gap-4">
+          <div className="mt-4 border-t border-white/10 px-2 pb-4 pt-5 md:hidden">
+            <div className="flex flex-col gap-5">
               <NavLinks
                 links={navigationData.links}
                 onNavigate={() => setIsMenuOpen(false)}

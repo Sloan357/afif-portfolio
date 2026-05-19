@@ -6,7 +6,7 @@ export function FeaturedProjects() {
   return (
     <section
       id="projects"
-      className="relative mx-auto max-w-7xl overflow-hidden px-6 py-24 sm:px-8 lg:px-12"
+      className="relative mx-auto max-w-7xl scroll-mt-24 overflow-hidden px-6 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24"
     >
       <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent lg:inset-x-12" />
 
@@ -20,7 +20,7 @@ export function FeaturedProjects() {
         </p>
       </div>
 
-      <div className="mt-12 grid gap-4 md:grid-cols-3">
+      <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {featuredProjectsData.projects.map((project) => (
           <ProjectCard key={project.title} project={project} />
         ))}
