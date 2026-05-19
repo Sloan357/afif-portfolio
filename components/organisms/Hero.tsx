@@ -9,7 +9,7 @@ export function Hero() {
       <div className="absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.045)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:radial-gradient(ellipse_at_center,black_0%,transparent_70%)]" />
 
-      <div className="grid items-center gap-16 lg:grid-cols-[minmax(0,1fr)_430px]">
+      <div className="grid items-center gap-16 xl:grid-cols-[minmax(0,1fr)_430px]">
         <HeroContent hero={heroData} />
         <ArchitectureCard architecture={heroData.architecture} />
       </div>

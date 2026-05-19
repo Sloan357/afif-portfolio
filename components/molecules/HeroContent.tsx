@@ -12,7 +12,7 @@ export function HeroContent({ hero }: HeroContentProps) {
     <div>
       <HeroBadge badge={hero.badge} />
 
-      <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl md:text-7xl lg:text-8xl">
+      <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl">
         {hero.headline}
       </h1>
 

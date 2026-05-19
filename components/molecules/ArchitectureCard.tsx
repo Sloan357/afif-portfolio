@@ -7,7 +7,7 @@ type ArchitectureCardProps = {
 
 export function ArchitectureCard({ architecture }: ArchitectureCardProps) {
   return (
-    <div className="hidden lg:block">
+    <div className="hidden md:block md:max-w-3xl xl:max-w-none">
       <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#08090d]/85 p-6 shadow-2xl shadow-black/45 backdrop-blur">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(14,165,233,0.13),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.045),transparent_34%)]" />
         <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/35 to-transparent" />
