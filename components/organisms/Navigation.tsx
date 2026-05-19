@@ -37,8 +37,10 @@ export function Navigation() {
             className="inline-flex items-center gap-3 text-sm font-semibold tracking-tight text-white"
             onClick={() => setIsMenuOpen(false)}
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-xs shadow-lg shadow-black/20">
-              A
+            <span className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-[#050608] text-xs shadow-lg shadow-black/20">
+              <span className="font-semibold text-white">A</span>
+              <span className="absolute bottom-1.5 left-1.5 right-1.5 h-0.5 rounded-full bg-emerald-400/80" />
+              <span className="absolute right-1.5 top-1.5 h-2 w-0.5 rotate-[-45deg] rounded-full bg-cyan-300/80" />
             </span>
             <span>{navigationData.logo.label}</span>
           </a>
