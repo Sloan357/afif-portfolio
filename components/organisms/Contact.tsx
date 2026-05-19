@@ -23,10 +23,7 @@ export function Contact() {
           {contactData.description}
         </p>
 
-        <ContactActions
-          primaryAction={contactData.primaryAction}
-          links={contactData.links}
-        />
+        <ContactActions actions={contactData.actions} />
       </div>
     </section>
   );
