@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ProjectPreview } from "@/components/atoms/ProjectPreview";
 import { TechTag } from "@/components/atoms/TechTag";
+import { ArchitectureNotes } from "@/components/molecules/ArchitectureNotes";
 import { TextLink } from "@/components/atoms/TextLink";
 import type { LabsData } from "@/data/labs";
 
@@ -76,6 +77,11 @@ export function LabCard({ lab }: LabCardProps) {
                 ))}
               </ul>
             </div>
+
+            <ArchitectureNotes
+              title="Architecture Notes"
+              sections={lab.concept.architectureNotes}
+            />
 
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">

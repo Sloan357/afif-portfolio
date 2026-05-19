@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProjectPreview } from "@/components/atoms/ProjectPreview";
 import { TechTag } from "@/components/atoms/TechTag";
+import { ArchitectureNotes } from "@/components/molecules/ArchitectureNotes";
 import {
   getFeaturedProjects,
   getProjectBySlug,
@@ -175,10 +176,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </div>
 
         <div className="mt-12 grid gap-4 lg:grid-cols-3">
-          <DetailList
-            title="Architecture Notes"
-            items={project.architectureNotes}
-          />
+          <ArchitectureNotes sections={project.architectureNotes} />
           <DetailList title="Challenges" items={project.challenges} />
           <DetailList title="Outcomes" items={project.outcomes} />
         </div>
