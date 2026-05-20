@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Geist, Geist_Mono } from "next/font/google";
-import { defaultSeoData } from "@/data/seo";
+import { createMetadataFromSeo, getSeoData } from "@/data/seo";
 import { isSupportedLocale, supportedLocales } from "@/i18n/routing";
 import "../globals.css";
 
@@ -15,45 +15,19 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://afifelcharif.com"),
-  title: defaultSeoData.metaTitle,
-  description: defaultSeoData.metaDescription,
-  alternates: {
-    canonical: defaultSeoData.canonicalUrl,
-  },
-  robots: {
-    index: !defaultSeoData.noIndex,
-    follow: !defaultSeoData.noIndex,
-  },
-  openGraph: {
-    title: defaultSeoData.ogTitle,
-    description: defaultSeoData.ogDescription,
-    url: defaultSeoData.canonicalUrl,
-    siteName: "Afif El Charif",
-    type: "website",
-    ...(defaultSeoData.ogImage
-      ? {
-          images: [
-            {
-              url: defaultSeoData.ogImage,
-              alt: defaultSeoData.ogTitle,
-            },
-          ],
-        }
-      : {}),
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: defaultSeoData.twitterTitle,
-    description: defaultSeoData.twitterDescription,
-    ...(defaultSeoData.twitterImage
-      ? {
-          images: [defaultSeoData.twitterImage],
-        }
-      : {}),
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  if (!isSupportedLocale(locale)) {
+    return {};
+  }
+
+  return createMetadataFromSeo(getSeoData(locale), locale);
+}
 
 export function generateStaticParams() {
   return supportedLocales.map((locale) => ({ locale }));

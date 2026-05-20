@@ -9,6 +9,7 @@ import {
   getProjectBySlug,
   type FeaturedProject,
 } from "@/data/projects";
+import { createMetadataFromSeo, getLocalizedUrl, getSeoData } from "@/data/seo";
 import { isSupportedLocale, supportedLocales } from "@/i18n/routing";
 
 type ProjectPageProps = {
@@ -42,19 +43,19 @@ export async function generateMetadata({
     return {};
   }
 
-  return {
-    title: `${project.title} — Afif El Charif`,
-    description: project.description,
-    alternates: {
-      canonical: `/${locale}/projects/${project.slug}`,
-    },
-    openGraph: {
-      title: `${project.title} — Afif El Charif`,
-      description: project.description,
-      url: `/${locale}/projects/${project.slug}`,
-      type: "article",
-    },
+  const path = `/projects/${project.slug}`;
+  const seo = {
+    ...getSeoData(locale, path),
+    metaTitle: `${project.title} - Afif El Charif`,
+    metaDescription: project.description,
+    canonicalUrl: getLocalizedUrl(locale, path),
+    ogTitle: `${project.title} - Afif El Charif`,
+    ogDescription: project.description,
+    twitterTitle: `${project.title} - Afif El Charif`,
+    twitterDescription: project.description,
   };
+
+  return createMetadataFromSeo(seo, locale, path, "article");
 }
 
 function DetailList({
