@@ -27,11 +27,11 @@ export default async function Home({ params }: HomePageProps) {
   return (
     <main lang={locale} className="min-h-screen bg-[#050608] text-white">
       <Navigation locale={locale} />
-      <Hero />
+      <Hero locale={locale} />
       <FeaturedProjects locale={locale} />
-      <Labs />
-      <Experience />
-      <Contact />
+      <Labs locale={locale} />
+      <Experience locale={locale} />
+      <Contact locale={locale} />
     </main>
   );
 }

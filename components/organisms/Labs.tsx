@@ -1,8 +1,15 @@
 import { SectionEyebrow } from "@/components/atoms/SectionEyebrow";
 import { LabCard } from "@/components/molecules/LabCard";
-import { labsData } from "@/data/labs";
+import { getLabsData } from "@/data/labs";
+import type { Locale } from "@/i18n/routing";
 
-export function Labs() {
+type LabsProps = {
+  locale: Locale;
+};
+
+export function Labs({ locale }: LabsProps) {
+  const labsData = getLabsData(locale);
+
   return (
     <section
       id="labs"

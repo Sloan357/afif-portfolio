@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { MenuToggle } from "@/components/atoms/MenuToggle";
 import { NavLinks } from "@/components/molecules/NavLinks";
 import { LanguageSwitcher } from "@/components/molecules/LanguageSwitcher";
-import { navigationData } from "@/data/navigation";
+import { getNavigationData } from "@/data/navigation";
 import { localizedPath, type Locale } from "@/i18n/routing";
 
 type NavigationProps = {
@@ -12,6 +12,7 @@ type NavigationProps = {
 };
 
 export function Navigation({ locale }: NavigationProps) {
+  const navigationData = getNavigationData(locale);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 

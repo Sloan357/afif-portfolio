@@ -1,4 +1,6 @@
 import type { ArchitectureNoteSection, CmsImage, CmsLink } from "@/data/types";
+import { resolveLocalizedContent } from "@/i18n/content";
+import type { Locale } from "@/i18n/routing";
 
 export type ProjectImage = CmsImage;
 export type ProjectExternalLink = CmsLink;
@@ -336,6 +338,34 @@ export const featuredProjectsData: FeaturedProjectsData = {
     },
   ],
 };
+
+export type FeaturedProjectsShellData = Omit<FeaturedProjectsData, "projects">;
+
+export const featuredProjectsShellContent = {
+  en: {
+    eyebrow: featuredProjectsData.eyebrow,
+    title: featuredProjectsData.title,
+    description: featuredProjectsData.description,
+  },
+  fr: {
+    eyebrow: "Projets selectionnes",
+    title: "Travaux d'ingenierie choisis",
+    description:
+      "Une selection courte de realisations autour des systemes backend, interfaces produit, workflows mobiles et fonctionnalites assistees par IA.",
+  },
+};
+
+export function getFeaturedProjectsData(locale: Locale): FeaturedProjectsData {
+  const shell = resolveLocalizedContent<FeaturedProjectsShellData>(
+    featuredProjectsShellContent,
+    locale,
+  ).content;
+
+  return {
+    ...featuredProjectsData,
+    ...shell,
+  };
+}
 
 export function getFeaturedProjects() {
   return featuredProjectsData.projects;

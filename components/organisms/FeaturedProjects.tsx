@@ -1,6 +1,6 @@
 import { SectionEyebrow } from "@/components/atoms/SectionEyebrow";
 import { FeaturedProjectGrid } from "@/components/molecules/FeaturedProjectGrid";
-import { featuredProjectsData } from "@/data/projects";
+import { getFeaturedProjectsData } from "@/data/projects";
 import type { Locale } from "@/i18n/routing";
 
 type FeaturedProjectsProps = {
@@ -8,6 +8,8 @@ type FeaturedProjectsProps = {
 };
 
 export function FeaturedProjects({ locale }: FeaturedProjectsProps) {
+  const featuredProjectsData = getFeaturedProjectsData(locale);
+
   return (
     <section
       id="projects"

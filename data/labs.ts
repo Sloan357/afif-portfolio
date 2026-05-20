@@ -1,4 +1,6 @@
 import type { ArchitectureNoteSection, CmsImage, CmsLink } from "@/data/types";
+import { resolveLocalizedContent } from "@/i18n/content";
+import type { Locale } from "@/i18n/routing";
 
 type LabConcept = {
   summary: string;
@@ -21,7 +23,7 @@ export type LabItem = {
   cta: Pick<CmsLink, "label" | "href">;
 };
 
-type LabsDataShape = {
+export type LabsDataShape = {
   eyebrow: string;
   title: string;
   description: string;
@@ -351,5 +353,33 @@ export const labsData: LabsDataShape = {
     },
   ],
 };
+
+export type LabsShellData = Omit<LabsDataShape, "labs">;
+
+export const labsShellContent = {
+  en: {
+    eyebrow: labsData.eyebrow,
+    title: labsData.title,
+    description: labsData.description,
+  },
+  fr: {
+    eyebrow: "Labs / En construction",
+    title: "Systemes personnels en cours",
+    description:
+      "Des experimentations orientees vers de nouvelles competences en IA, integrations backend, visibilite DevOps et produits mobiles.",
+  },
+};
+
+export function getLabsData(locale: Locale): LabsDataShape {
+  const shell = resolveLocalizedContent<LabsShellData>(
+    labsShellContent,
+    locale,
+  ).content;
+
+  return {
+    ...labsData,
+    ...shell,
+  };
+}
 
 export type LabsData = typeof labsData;

@@ -1,8 +1,15 @@
 import { SectionEyebrow } from "@/components/atoms/SectionEyebrow";
 import { ContactActions } from "@/components/molecules/ContactActions";
-import { contactData } from "@/data/contact";
+import { getContactData } from "@/data/contact";
+import type { Locale } from "@/i18n/routing";
 
-export function Contact() {
+type ContactProps = {
+  locale: Locale;
+};
+
+export function Contact({ locale }: ContactProps) {
+  const contactData = getContactData(locale);
+
   return (
     <section
       id="contact"

@@ -1,3 +1,6 @@
+import { resolveLocalizedContent } from "@/i18n/content";
+import type { Locale } from "@/i18n/routing";
+
 export const experienceData = {
   eyebrow: "About / Experience",
   title: "Backend-minded engineering across product systems",
@@ -72,3 +75,35 @@ export const experienceData = {
 } as const;
 
 export type ExperienceData = typeof experienceData;
+
+export type ExperienceShellData = {
+  eyebrow: string;
+  title: string;
+  introduction: string;
+};
+
+export const experienceShellContent = {
+  en: {
+    eyebrow: experienceData.eyebrow,
+    title: experienceData.title,
+    introduction: experienceData.introduction,
+  },
+  fr: {
+    eyebrow: "A propos / Experience",
+    title: "Ingenierie orientee backend pour des systemes produit",
+    introduction:
+      "Je construis des systemes full-stack avec un accent sur l'architecture backend, les APIs fiables, les workflows mobiles, les bases SaaS, les integrations IA et les operations de deploiement.",
+  },
+};
+
+export function getExperienceData(locale: Locale) {
+  const shell = resolveLocalizedContent<ExperienceShellData>(
+    experienceShellContent,
+    locale,
+  ).content;
+
+  return {
+    ...experienceData,
+    ...shell,
+  };
+}

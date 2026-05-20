@@ -1,9 +1,16 @@
 import { SectionEyebrow } from "@/components/atoms/SectionEyebrow";
 import { TechTag } from "@/components/atoms/TechTag";
 import { ExperienceCard } from "@/components/molecules/ExperienceCard";
-import { experienceData } from "@/data/experience";
+import { getExperienceData } from "@/data/experience";
+import type { Locale } from "@/i18n/routing";
 
-export function Experience() {
+type ExperienceProps = {
+  locale: Locale;
+};
+
+export function Experience({ locale }: ExperienceProps) {
+  const experienceData = getExperienceData(locale);
+
   return (
     <section
       id="experience"
