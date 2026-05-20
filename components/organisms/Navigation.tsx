@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { MenuToggle } from "@/components/atoms/MenuToggle";
 import { NavLinks } from "@/components/molecules/NavLinks";
+import { LanguageSwitcher } from "@/components/molecules/LanguageSwitcher";
 import { navigationData } from "@/data/navigation";
 import { localizedPath, type Locale } from "@/i18n/routing";
 
@@ -52,6 +53,7 @@ export function Navigation({ locale }: NavigationProps) {
 
           <div className="hidden items-center gap-7 md:flex">
             <NavLinks links={navigationData.links} locale={locale} />
+            <LanguageSwitcher locale={locale} />
           </div>
 
           <MenuToggle
@@ -65,6 +67,10 @@ export function Navigation({ locale }: NavigationProps) {
             <div className="flex flex-col gap-5">
               <NavLinks
                 links={navigationData.links}
+                locale={locale}
+                onNavigate={() => setIsMenuOpen(false)}
+              />
+              <LanguageSwitcher
                 locale={locale}
                 onNavigate={() => setIsMenuOpen(false)}
               />

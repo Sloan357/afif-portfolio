@@ -27,3 +27,14 @@ export function localizedPath(locale: Locale, href: string) {
 
   return href;
 }
+
+export function switchLocalePath(pathname: string, targetLocale: Locale) {
+  const segments = pathname.split("/").filter(Boolean);
+  const currentLocale = segments[0];
+
+  if (currentLocale && isSupportedLocale(currentLocale)) {
+    return `/${[targetLocale, ...segments.slice(1)].join("/")}`;
+  }
+
+  return `/${[targetLocale, ...segments].join("/")}`;
+}
