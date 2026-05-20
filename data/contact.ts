@@ -66,6 +66,8 @@ export const contactData: ContactData = {
 
 export type ContactShellData = Omit<ContactData, "actions">;
 
+export type ContactActionLabels = Record<CmsLink["type"], string>;
+
 export const contactShellContent = {
   en: {
     eyebrow: contactData.eyebrow,
@@ -80,14 +82,35 @@ export const contactShellContent = {
   },
 };
 
+export const contactActionLabelContent = {
+  en: Object.fromEntries(
+    contactData.actions.map((action) => [action.type, action.label]),
+  ) as ContactActionLabels,
+  fr: {
+    email: "M'envoyer un email",
+    github: "GitHub",
+    linkedin: "LinkedIn",
+    cv: "Telecharger le CV",
+    booking: "Planifier un appel",
+  },
+};
+
 export function getContactData(locale: Locale): ContactData {
   const shell = resolveLocalizedContent<ContactShellData>(
     contactShellContent,
+    locale,
+  ).content;
+  const actionLabels = resolveLocalizedContent<ContactActionLabels>(
+    contactActionLabelContent,
     locale,
   ).content;
 
   return {
     ...contactData,
     ...shell,
+    actions: contactData.actions.map((action) => ({
+      ...action,
+      label: actionLabels[action.type] ?? action.label,
+    })),
   };
 }

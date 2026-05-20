@@ -24,7 +24,7 @@ export function ContactActions({ actions }: ContactActionsProps) {
 
       {secondaryActions.map((link) => (
         <a
-          key={link.label}
+          key={link.href}
           href={link.href}
           target={link.opensInNewTab ? "_blank" : undefined}
           rel={link.opensInNewTab ? "noreferrer" : undefined}
