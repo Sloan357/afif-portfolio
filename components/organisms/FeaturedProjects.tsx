@@ -1,8 +1,13 @@
 import { SectionEyebrow } from "@/components/atoms/SectionEyebrow";
 import { FeaturedProjectGrid } from "@/components/molecules/FeaturedProjectGrid";
 import { featuredProjectsData } from "@/data/projects";
+import type { Locale } from "@/i18n/routing";
 
-export function FeaturedProjects() {
+type FeaturedProjectsProps = {
+  locale: Locale;
+};
+
+export function FeaturedProjects({ locale }: FeaturedProjectsProps) {
   return (
     <section
       id="projects"
@@ -20,7 +25,7 @@ export function FeaturedProjects() {
         </p>
       </div>
 
-      <FeaturedProjectGrid projects={featuredProjectsData.projects} />
+      <FeaturedProjectGrid projects={featuredProjectsData.projects} locale={locale} />
     </section>
   );
 }

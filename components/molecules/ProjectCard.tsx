@@ -2,12 +2,14 @@ import { ProjectPreview } from "@/components/atoms/ProjectPreview";
 import { TechTag } from "@/components/atoms/TechTag";
 import { TextLink } from "@/components/atoms/TextLink";
 import type { FeaturedProjectsData } from "@/data/projects";
+import { localizedPath, type Locale } from "@/i18n/routing";
 
 type ProjectCardProps = {
   project: FeaturedProjectsData["projects"][number];
+  locale: Locale;
 };
 
-export function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({ project, locale }: ProjectCardProps) {
   return (
     <article className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#08090d]/80 p-6 shadow-2xl shadow-black/30 backdrop-blur transition hover:border-white/20 hover:bg-[#0b0d12]/90">
       <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/25 to-transparent" />
@@ -35,7 +37,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
         </div>
 
         <div className="mt-8 border-t border-white/10 pt-5">
-          <TextLink href={project.cta.href}>{project.cta.label}</TextLink>
+          <TextLink href={localizedPath(locale, project.cta.href)}>
+            {project.cta.label}
+          </TextLink>
         </div>
       </div>
     </article>

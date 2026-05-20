@@ -9,23 +9,33 @@ import {
   getProjectBySlug,
   type FeaturedProject,
 } from "@/data/projects";
+import { isSupportedLocale, supportedLocales } from "@/i18n/routing";
 
 type ProjectPageProps = {
   params: Promise<{
+    locale: string;
     slug: string;
   }>;
 };
 
 export function generateStaticParams() {
-  return getFeaturedProjects().map((project) => ({
-    slug: project.slug,
-  }));
+  return supportedLocales.flatMap((locale) =>
+    getFeaturedProjects().map((project) => ({
+      locale,
+      slug: project.slug,
+    })),
+  );
 }
 
 export async function generateMetadata({
   params,
 }: ProjectPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
+
+  if (!isSupportedLocale(locale)) {
+    return {};
+  }
+
   const project = getProjectBySlug(slug);
 
   if (!project) {
@@ -36,12 +46,12 @@ export async function generateMetadata({
     title: `${project.title} — Afif El Charif`,
     description: project.description,
     alternates: {
-      canonical: `/projects/${project.slug}`,
+      canonical: `/${locale}/projects/${project.slug}`,
     },
     openGraph: {
       title: `${project.title} — Afif El Charif`,
       description: project.description,
-      url: `/projects/${project.slug}`,
+      url: `/${locale}/projects/${project.slug}`,
       type: "article",
     },
   };
@@ -99,7 +109,12 @@ function Gallery({ project }: { project: FeaturedProject }) {
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
+
+  if (!isSupportedLocale(locale)) {
+    notFound();
+  }
+
   const project = getProjectBySlug(slug);
 
   if (!project) {
@@ -107,13 +122,13 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-[#050608] text-white">
+    <main lang={locale} className="min-h-screen bg-[#050608] text-white">
       <section className="relative isolate mx-auto max-w-7xl overflow-hidden px-6 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24">
         <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_18%_18%,rgba(14,165,233,0.12),transparent_28%),radial-gradient(circle_at_82%_24%,rgba(34,197,94,0.1),transparent_24%),linear-gradient(180deg,#050608_0%,#09090b_50%,#050608_100%)]" />
         <div className="absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
         <Link
-          href="/#projects"
+          href={`/${locale}#projects`}
           className="inline-flex text-sm font-semibold text-neutral-300 underline-offset-4 transition hover:text-cyan-200 hover:underline"
         >
           Back to Projects

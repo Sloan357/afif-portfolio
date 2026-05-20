@@ -4,8 +4,13 @@ import { useEffect, useState } from "react";
 import { MenuToggle } from "@/components/atoms/MenuToggle";
 import { NavLinks } from "@/components/molecules/NavLinks";
 import { navigationData } from "@/data/navigation";
+import { localizedPath, type Locale } from "@/i18n/routing";
 
-export function Navigation() {
+type NavigationProps = {
+  locale: Locale;
+};
+
+export function Navigation({ locale }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -33,7 +38,7 @@ export function Navigation() {
       >
         <div className="flex items-center justify-between gap-6">
           <a
-            href={navigationData.logo.href}
+            href={localizedPath(locale, navigationData.logo.href)}
             className="inline-flex items-center gap-3 text-sm font-semibold tracking-tight text-white"
             onClick={() => setIsMenuOpen(false)}
           >
@@ -46,7 +51,7 @@ export function Navigation() {
           </a>
 
           <div className="hidden items-center gap-7 md:flex">
-            <NavLinks links={navigationData.links} />
+            <NavLinks links={navigationData.links} locale={locale} />
           </div>
 
           <MenuToggle
@@ -60,6 +65,7 @@ export function Navigation() {
             <div className="flex flex-col gap-5">
               <NavLinks
                 links={navigationData.links}
+                locale={locale}
                 onNavigate={() => setIsMenuOpen(false)}
               />
             </div>

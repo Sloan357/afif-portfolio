@@ -3,9 +3,11 @@
 import { useMemo, useState } from "react";
 import { ProjectCard } from "@/components/molecules/ProjectCard";
 import type { FeaturedProject } from "@/data/projects";
+import type { Locale } from "@/i18n/routing";
 
 type FeaturedProjectGridProps = {
   projects: FeaturedProject[];
+  locale: Locale;
 };
 
 const allFilter = "All";
@@ -39,7 +41,10 @@ function getProjectFilters(projects: FeaturedProject[]) {
   ];
 }
 
-export function FeaturedProjectGrid({ projects }: FeaturedProjectGridProps) {
+export function FeaturedProjectGrid({
+  projects,
+  locale,
+}: FeaturedProjectGridProps) {
   const filters = useMemo(() => getProjectFilters(projects), [projects]);
   const [activeFilter, setActiveFilter] = useState(allFilter);
 
@@ -73,7 +78,7 @@ export function FeaturedProjectGrid({ projects }: FeaturedProjectGridProps) {
 
       <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {filteredProjects.map((project) => (
-          <ProjectCard key={project.title} project={project} />
+          <ProjectCard key={project.title} project={project} locale={locale} />
         ))}
       </div>
     </>

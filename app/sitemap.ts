@@ -4,9 +4,14 @@ const siteUrl = "https://afifelcharif.com";
 
 const staticRoutes = [
   {
-    path: "",
+    path: "/en",
     changeFrequency: "monthly",
     priority: 1,
+  },
+  {
+    path: "/fr",
+    changeFrequency: "monthly",
+    priority: 0.8,
   },
 ] as const;
 
