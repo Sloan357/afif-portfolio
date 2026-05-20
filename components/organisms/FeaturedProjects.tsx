@@ -27,7 +27,11 @@ export function FeaturedProjects({ locale }: FeaturedProjectsProps) {
         </p>
       </div>
 
-      <FeaturedProjectGrid projects={featuredProjectsData.projects} locale={locale} />
+      <FeaturedProjectGrid
+        projects={featuredProjectsData.projects}
+        categoryLabels={featuredProjectsData.categoryLabels}
+        locale={locale}
+      />
     </section>
   );
 }

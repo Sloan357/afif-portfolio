@@ -7,6 +7,7 @@ import type { Locale } from "@/i18n/routing";
 
 type FeaturedProjectGridProps = {
   projects: FeaturedProject[];
+  categoryLabels: Record<string, string>;
   locale: Locale;
 };
 
@@ -43,6 +44,7 @@ function getProjectFilters(projects: FeaturedProject[]) {
 
 export function FeaturedProjectGrid({
   projects,
+  categoryLabels,
   locale,
 }: FeaturedProjectGridProps) {
   const filters = useMemo(() => getProjectFilters(projects), [projects]);
@@ -70,7 +72,7 @@ export function FeaturedProjectGrid({
                   : "border-white/10 bg-white/[0.035] text-neutral-300 hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
               }`}
             >
-              {filter}
+              {categoryLabels[filter] ?? filter}
             </button>
           );
         })}

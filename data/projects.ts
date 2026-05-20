@@ -1,5 +1,5 @@
 import type { ArchitectureNoteSection, CmsImage, CmsLink } from "@/data/types";
-import { resolveLocalizedContent } from "@/i18n/content";
+import { resolveLocalizedContent, type LocalizedContent } from "@/i18n/content";
 import type { Locale } from "@/i18n/routing";
 
 export type ProjectImage = CmsImage;
@@ -28,6 +28,7 @@ export type FeaturedProjectsData = {
   eyebrow: string;
   title: string;
   description: string;
+  categoryLabels: Record<string, string>;
   projects: FeaturedProject[];
 };
 
@@ -36,6 +37,13 @@ export const featuredProjectsData: FeaturedProjectsData = {
   title: "Selected engineering work",
   description:
     "A small set of representative builds across backend systems, product interfaces, mobile workflows, and AI-assisted features.",
+  categoryLabels: {
+    All: "All",
+    CMS: "CMS",
+    AI: "AI",
+    Mobile: "Mobile",
+    Backend: "Backend",
+  },
   projects: [
     {
       slug: "nam-house-of-sleep",
@@ -341,19 +349,137 @@ export const featuredProjectsData: FeaturedProjectsData = {
 
 export type FeaturedProjectsShellData = Omit<FeaturedProjectsData, "projects">;
 
+export type ProjectSummaryFields = Pick<
+  FeaturedProject,
+  "title" | "subtitle" | "description" | "type" | "categories" | "cta"
+>;
+
 export const featuredProjectsShellContent = {
   en: {
     eyebrow: featuredProjectsData.eyebrow,
     title: featuredProjectsData.title,
     description: featuredProjectsData.description,
+    categoryLabels: featuredProjectsData.categoryLabels,
   },
   fr: {
     eyebrow: "Projets selectionnes",
     title: "Travaux d'ingenierie choisis",
     description:
       "Une selection courte de realisations autour des systemes backend, interfaces produit, workflows mobiles et fonctionnalites assistees par IA.",
+    categoryLabels: {
+      All: "Tous",
+      CMS: "CMS",
+      AI: "IA",
+      Mobile: "Mobile",
+      Backend: "Backend",
+    },
   },
 };
+
+export const projectSummaryContent: Record<
+  FeaturedProject["slug"],
+  LocalizedContent<ProjectSummaryFields>
+> = {
+  "nam-house-of-sleep": {
+    en: {
+      title: "Nam House of Sleep",
+      subtitle:
+        "CMS-managed product website for a sleep and home product brand.",
+      description:
+        "Informative website with CMS-managed product pages and a modern product-focused frontend for presenting collections clearly.",
+      type: "Product website",
+      categories: ["CMS", "Backend"],
+      cta: {
+        label: "View details",
+        href: "/projects/nam-house-of-sleep",
+      },
+    },
+    fr: {
+      title: "Nam House of Sleep",
+      subtitle:
+        "Site produit gere par CMS pour une marque autour du sommeil et de la maison.",
+      description:
+        "Site informatif avec pages produit gerees par CMS et frontend moderne centre sur la presentation claire des collections.",
+      type: "Site produit",
+      categories: ["CMS", "Backend"],
+      cta: {
+        label: "Voir le detail",
+        href: "/projects/nam-house-of-sleep",
+      },
+    },
+  },
+  "ai-sourcing-platform": {
+    en: {
+      title: "AI Sourcing Platform",
+      subtitle: "AI-powered sourcing and workflow automation platform.",
+      description:
+        "AI-powered sourcing and workflow automation platform focused on scalable architecture and intelligent operational flows.",
+      type: "AI platform",
+      categories: ["AI", "Backend"],
+      cta: {
+        label: "View details",
+        href: "/projects/ai-sourcing-platform",
+      },
+    },
+    fr: {
+      title: "AI Sourcing Platform",
+      subtitle:
+        "Plateforme de sourcing et d'automatisation de workflows alimentee par l'IA.",
+      description:
+        "Plateforme de sourcing et d'automatisation par IA, concue autour d'une architecture scalable et de workflows operationnels intelligents.",
+      type: "Plateforme IA",
+      categories: ["AI", "Backend"],
+      cta: {
+        label: "Voir le detail",
+        href: "/projects/ai-sourcing-platform",
+      },
+    },
+  },
+  "household-manager-app": {
+    en: {
+      title: "Household Manager App",
+      subtitle:
+        "Realtime household collaboration app for pantry, groceries, and recipes.",
+      description:
+        "Mobile app for pantry management, grocery lists, recipes, and realtime household collaboration across shared accounts.",
+      type: "Mobile application",
+      categories: ["Mobile", "Backend"],
+      cta: {
+        label: "View details",
+        href: "/projects/household-manager-app",
+      },
+    },
+    fr: {
+      title: "Household Manager App",
+      subtitle:
+        "Application collaborative en temps reel pour garde-manger, courses et recettes.",
+      description:
+        "Application mobile pour gerer le garde-manger, les listes de courses, les recettes et la collaboration familiale en temps reel.",
+      type: "Application mobile",
+      categories: ["Mobile", "Backend"],
+      cta: {
+        label: "Voir le detail",
+        href: "/projects/household-manager-app",
+      },
+    },
+  },
+};
+
+function getLocalizedProjectSummary(project: FeaturedProject, locale: Locale) {
+  const localizedSummary = projectSummaryContent[project.slug];
+
+  if (!localizedSummary) {
+    return project;
+  }
+
+  return {
+    ...project,
+    ...resolveLocalizedContent<ProjectSummaryFields>(
+      localizedSummary,
+      locale,
+    ).content,
+  };
+}
 
 export function getFeaturedProjectsData(locale: Locale): FeaturedProjectsData {
   const shell = resolveLocalizedContent<FeaturedProjectsShellData>(
@@ -364,6 +490,9 @@ export function getFeaturedProjectsData(locale: Locale): FeaturedProjectsData {
   return {
     ...featuredProjectsData,
     ...shell,
+    projects: featuredProjectsData.projects.map((project) =>
+      getLocalizedProjectSummary(project, locale),
+    ),
   };
 }
 
