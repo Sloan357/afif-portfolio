@@ -1,21 +1,8 @@
-import type { ArchitectureNoteSection } from "@/data/architecture";
+import type { ArchitectureNoteSection, CmsImage, CmsLink } from "@/data/types";
 
-export type ProjectImage = {
-  src: string | null;
-  alt: string;
-  variants?: {
-    mobile?: string | null;
-    desktop?: string | null;
-  };
-};
-
-export type ProjectExternalLink = {
-  label: string;
-  href: string;
-  type: string;
-  isExternal: boolean;
-  isVisible: boolean;
-};
+export type ProjectImage = CmsImage;
+export type ProjectExternalLink = CmsLink;
+export type ProjectCta = Pick<CmsLink, "label" | "href">;
 
 export type FeaturedProject = {
   slug: string;
@@ -32,10 +19,7 @@ export type FeaturedProject = {
   challenges: string[];
   outcomes: string[];
   externalLinks: ProjectExternalLink[];
-  cta: {
-    label: string;
-    href: string;
-  };
+  cta: ProjectCta;
 };
 
 export type FeaturedProjectsData = {

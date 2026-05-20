@@ -1,4 +1,4 @@
-import type { ArchitectureNoteSection } from "@/data/architecture";
+import type { ArchitectureNoteSection, CmsImage, CmsLink } from "@/data/types";
 
 type LabConcept = {
   summary: string;
@@ -8,26 +8,17 @@ type LabConcept = {
   architectureNotes: ArchitectureNoteSection[];
 };
 
-type LabItem = {
+export type LabItem = {
+  slug: string;
   title: string;
   description: string;
   type: string;
-  coverImage: {
-    src: string | null;
-    alt: string;
-    variants: {
-      mobile: string | null;
-      desktop: string | null;
-    };
-  };
-  galleryImages: [];
+  coverImage: CmsImage | null;
+  galleryImages: CmsImage[];
   stack: string[];
   showcase: string;
   concept: LabConcept;
-  cta: {
-    label: string;
-    href: string;
-  };
+  cta: Pick<CmsLink, "label" | "href">;
 };
 
 type LabsDataShape = {
@@ -44,6 +35,7 @@ export const labsData: LabsDataShape = {
     "Experimental builds focused on sharpening new skills across AI workflows, backend integrations, DevOps visibility, and mobile product systems.",
   labs: [
     {
+      slug: "ai-crm-assistant",
       title: "AI CRM Assistant",
       description:
         "Extracts follow-ups, reminders, summaries, and contacts from meetings or notes to support cleaner relationship management workflows.",
@@ -147,6 +139,7 @@ export const labsData: LabsDataShape = {
       },
     },
     {
+      slug: "deployment-dashboard",
       title: "Deployment Dashboard",
       description:
         "Tracks DigitalOcean deployments, uptime, SSL status, logs, and services from a focused operations dashboard.",
@@ -250,6 +243,7 @@ export const labsData: LabsDataShape = {
       },
     },
     {
+      slug: "smart-pantry-ai-engine",
       title: "Smart Pantry AI Engine",
       description:
         "AI recipe suggestions, receipt parsing, expiration tracking, and shopping optimization for household planning flows.",

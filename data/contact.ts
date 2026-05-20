@@ -1,4 +1,13 @@
-export const contactData = {
+import type { CmsLink } from "@/data/types";
+
+export type ContactData = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  actions: CmsLink[];
+};
+
+export const contactData: ContactData = {
   eyebrow: "Contact / Let's Build Something",
   title: "Have a system, product, or workflow worth building?",
   description:
@@ -51,6 +60,4 @@ export const contactData = {
       isPrimary: false,
     },
   ],
-} as const;
-
-export type ContactData = typeof contactData;
+};

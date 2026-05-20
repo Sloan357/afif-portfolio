@@ -1,15 +1,6 @@
-export type SeoData = {
-  metaTitle: string;
-  metaDescription: string;
-  canonicalUrl: string;
-  ogTitle: string;
-  ogDescription: string;
-  ogImage: string | null;
-  twitterTitle: string;
-  twitterDescription: string;
-  twitterImage: string | null;
-  noIndex: boolean;
-};
+import type { SeoData } from "@/data/types";
+
+export type { SeoData } from "@/data/types";
 
 export const defaultSeoData: SeoData = {
   metaTitle: "Afif El Charif — Full-Stack Software Engineer",

@@ -23,7 +23,7 @@ export function Labs() {
 
       <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {labsData.labs.map((lab) => (
-          <LabCard key={lab.title} lab={lab} />
+          <LabCard key={lab.slug} lab={lab} />
         ))}
       </div>
     </section>

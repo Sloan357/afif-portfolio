@@ -1,6 +1,1 @@
-export type ArchitectureNoteSection = {
-  title: string;
-  summary: string;
-  items: string[];
-  isDefaultOpen?: boolean;
-};
+export type { ArchitectureNoteSection } from "@/data/types";
