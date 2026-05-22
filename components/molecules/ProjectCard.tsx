@@ -11,7 +11,7 @@ type ProjectCardProps = {
 
 export function ProjectCard({ project, locale }: ProjectCardProps) {
   return (
-    <article className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#08090d]/80 p-6 shadow-2xl shadow-black/30 backdrop-blur transition hover:border-white/20 hover:bg-[#0b0d12]/90">
+    <article className="motion-card-reveal group relative overflow-hidden rounded-2xl border border-white/10 bg-[#08090d]/80 p-6 shadow-2xl shadow-black/30 backdrop-blur transition hover:border-white/20 hover:bg-[#0b0d12]/90">
       <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/25 to-transparent" />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_0%,rgba(14,165,233,0.1),transparent_32%),linear-gradient(180deg,rgba(255,255,255,0.035),transparent_42%)]" />
 

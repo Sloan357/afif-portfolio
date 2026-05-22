@@ -17,7 +17,7 @@ export function Hero({ locale }: HeroProps) {
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.045)_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_at_center,black_0%,transparent_70%)] bg-[size:72px_72px]" />
       <div className="absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-b from-transparent to-[#050608]" />
 
-      <div className="grid items-center gap-10 md:gap-12 xl:grid-cols-[minmax(0,1fr)_430px] xl:gap-16">
+      <div className="motion-hero-enter grid items-center gap-10 md:gap-12 xl:grid-cols-[minmax(0,1fr)_430px] xl:gap-16">
         <HeroContent hero={heroData} />
         <ArchitectureCard architecture={heroData.architecture} />
       </div>

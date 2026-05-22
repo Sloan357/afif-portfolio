@@ -7,7 +7,7 @@ type ExperienceCardProps = {
 
 export function ExperienceCard({ experience }: ExperienceCardProps) {
   return (
-    <article className="relative ml-8 overflow-hidden rounded-2xl border border-white/10 bg-[#08090d]/80 p-6 shadow-2xl shadow-black/30 backdrop-blur transition hover:border-white/20 hover:bg-[#0b0d12]/90">
+    <article className="motion-card-reveal relative ml-8 overflow-hidden rounded-2xl border border-white/10 bg-[#08090d]/80 p-6 shadow-2xl shadow-black/30 backdrop-blur transition hover:border-white/20 hover:bg-[#0b0d12]/90">
       <div className="absolute top-7 -left-[2.35rem] h-6 w-6 rounded-full border border-cyan-200/25 bg-[#050608] shadow-[0_0_28px_rgba(14,165,233,0.16)]">
         <div className="absolute inset-2 rounded-full bg-emerald-300/80" />
       </div>
