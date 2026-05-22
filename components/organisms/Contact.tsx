@@ -30,7 +30,10 @@ export function Contact({ locale }: ContactProps) {
           {contactData.description}
         </p>
 
-        <ContactActions actions={contactData.actions} />
+        <ContactActions
+          actions={contactData.actions}
+          interactionLabels={contactData.interactionLabels}
+        />
       </div>
     </section>
   );

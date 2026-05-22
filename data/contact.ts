@@ -7,6 +7,11 @@ export type ContactData = {
   title: string;
   description: string;
   actions: CmsLink[];
+  interactionLabels: {
+    copyEmail: string;
+    copiedEmail: string;
+    copyFailed: string;
+  };
 };
 
 export const contactData: ContactData = {
@@ -14,6 +19,11 @@ export const contactData: ContactData = {
   title: "Have a system, product, or workflow worth building?",
   description:
     "I work best on practical software with real constraints: backend architecture, mobile workflows, SaaS platforms, AI integrations, and deployment operations.",
+  interactionLabels: {
+    copyEmail: "Copy email",
+    copiedEmail: "Email copied",
+    copyFailed: "Could not copy email",
+  },
   actions: [
     {
       label: "Email me",
@@ -73,12 +83,18 @@ export const contactShellContent = {
     eyebrow: contactData.eyebrow,
     title: contactData.title,
     description: contactData.description,
+    interactionLabels: contactData.interactionLabels,
   },
   fr: {
     eyebrow: "Contact / Construisons quelque chose",
     title: "Vous avez un systeme, un produit ou un workflow a construire ?",
     description:
       "Je travaille mieux sur des logiciels concrets avec de vraies contraintes : architecture backend, workflows mobiles, plateformes SaaS, integrations IA et operations de deploiement.",
+    interactionLabels: {
+      copyEmail: "Copier l'email",
+      copiedEmail: "Email copie",
+      copyFailed: "Impossible de copier l'email",
+    },
   },
 };
 
