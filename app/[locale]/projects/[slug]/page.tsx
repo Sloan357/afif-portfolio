@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProjectPreview } from "@/components/atoms/ProjectPreview";
+import { StructuredData } from "@/components/atoms/StructuredData";
 import { TechTag } from "@/components/atoms/TechTag";
 import { ArchitectureNotes } from "@/components/molecules/ArchitectureNotes";
 import {
@@ -10,6 +11,7 @@ import {
   type FeaturedProject,
 } from "@/data/projects";
 import { createMetadataFromSeo, getLocalizedUrl, getSeoData } from "@/data/seo";
+import { createProjectJsonLd } from "@/data/structured-data";
 import { isSupportedLocale, supportedLocales } from "@/i18n/routing";
 
 type ProjectPageProps = {
@@ -124,6 +126,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   return (
     <main lang={locale} className="min-h-screen bg-[#050608] text-white">
+      <StructuredData data={createProjectJsonLd(project, locale)} />
       <section className="relative isolate mx-auto max-w-7xl overflow-hidden px-6 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24">
         <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_18%_18%,rgba(14,165,233,0.12),transparent_28%),radial-gradient(circle_at_82%_24%,rgba(34,197,94,0.1),transparent_24%),linear-gradient(180deg,#050608_0%,#09090b_50%,#050608_100%)]" />
         <div className="absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
