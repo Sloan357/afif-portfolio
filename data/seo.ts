@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
+import { siteUrl } from "@/config/site";
 import type { SeoData } from "@/data/types";
 import { resolveLocalizedContent, type LocalizedContent } from "@/i18n/content";
 import { defaultLocale, supportedLocales, type Locale } from "@/i18n/routing";
 
 export type { SeoData } from "@/data/types";
-
-export const siteUrl = "https://afifelcharif.com";
 
 export const seoContent: LocalizedContent<SeoData> = {
   en: {

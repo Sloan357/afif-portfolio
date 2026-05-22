@@ -1,6 +1,7 @@
 import type { FeaturedProject } from "@/data/projects";
 import type { SeoData } from "@/data/types";
-import { getLanguageAlternates, getLocalizedUrl, siteUrl } from "@/data/seo";
+import { siteUrl } from "@/config/site";
+import { getLanguageAlternates, getLocalizedUrl } from "@/data/seo";
 import type { Locale } from "@/i18n/routing";
 
 const personId = `${siteUrl}/#person`;
