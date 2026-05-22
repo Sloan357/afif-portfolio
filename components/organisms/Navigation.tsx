@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 import { MenuToggle } from "@/components/atoms/MenuToggle";
 import { NavLinks } from "@/components/molecules/NavLinks";
 import { LanguageSwitcher } from "@/components/molecules/LanguageSwitcher";
@@ -12,9 +13,58 @@ type NavigationProps = {
 };
 
 export function Navigation({ locale }: NavigationProps) {
-  const navigationData = getNavigationData(locale);
+  const navigationData = useMemo(() => getNavigationData(locale), [locale]);
+  const pathname = usePathname();
+  const [activeHref, setActiveHref] = useState<string | null>(null);
+  const activeNavHref = pathname === `/${locale}` ? activeHref : null;
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const homepagePath = `/${locale}`;
+
+    if (pathname !== homepagePath) {
+      return;
+    }
+
+    const sectionLinks = navigationData.links.filter((link) =>
+      link.href.startsWith("#"),
+    );
+    const sections = sectionLinks
+      .map((link) => document.getElementById(link.href.slice(1)))
+      .filter((section): section is HTMLElement => Boolean(section));
+
+    if (sections.length === 0) {
+      return;
+    }
+
+    const updateActiveSection = () => {
+      const viewportAnchor = window.innerHeight * 0.35;
+      const currentSection = sections.reduce<HTMLElement | null>(
+        (activeSection, section) => {
+          const rect = section.getBoundingClientRect();
+
+          if (rect.top <= viewportAnchor && rect.bottom > viewportAnchor) {
+            return section;
+          }
+
+          return activeSection;
+        },
+        null,
+      );
+
+      setActiveHref(currentSection ? `#${currentSection.id}` : null);
+    };
+
+    updateActiveSection();
+    window.addEventListener("scroll", updateActiveSection, { passive: true });
+    window.addEventListener("resize", updateActiveSection);
+
+    return () => {
+      window.removeEventListener("scroll", updateActiveSection);
+      window.removeEventListener("resize", updateActiveSection);
+    };
+  }, [locale, navigationData.links, pathname]);
 
   useEffect(() => {
     const updateScrollState = () => {
@@ -53,7 +103,11 @@ export function Navigation({ locale }: NavigationProps) {
           </a>
 
           <div className="hidden items-center gap-7 md:flex">
-            <NavLinks links={navigationData.links} locale={locale} />
+            <NavLinks
+              links={navigationData.links}
+              locale={locale}
+              activeHref={activeNavHref}
+            />
             <LanguageSwitcher locale={locale} />
           </div>
 
@@ -69,6 +123,7 @@ export function Navigation({ locale }: NavigationProps) {
               <NavLinks
                 links={navigationData.links}
                 locale={locale}
+                activeHref={activeNavHref}
                 onNavigate={() => setIsMenuOpen(false)}
               />
               <LanguageSwitcher
