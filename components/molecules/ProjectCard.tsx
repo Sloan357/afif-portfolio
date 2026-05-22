@@ -19,7 +19,7 @@ export function ProjectCard({ project, locale }: ProjectCardProps) {
         <ProjectPreview image={project.coverImage} label={project.title} />
 
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200/70">
+          <p className="text-xs font-semibold tracking-[0.2em] text-emerald-200/70 uppercase">
             {project.type}
           </p>
           <h3 className="mt-4 text-xl font-semibold tracking-tight text-white transition group-hover:text-cyan-50">

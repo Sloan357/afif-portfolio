@@ -8,7 +8,7 @@ type ExperienceCardProps = {
 export function ExperienceCard({ experience }: ExperienceCardProps) {
   return (
     <article className="relative ml-8 overflow-hidden rounded-2xl border border-white/10 bg-[#08090d]/80 p-6 shadow-2xl shadow-black/30 backdrop-blur transition hover:border-white/20 hover:bg-[#0b0d12]/90">
-      <div className="absolute -left-[2.35rem] top-7 h-6 w-6 rounded-full border border-cyan-200/25 bg-[#050608] shadow-[0_0_28px_rgba(14,165,233,0.16)]">
+      <div className="absolute top-7 -left-[2.35rem] h-6 w-6 rounded-full border border-cyan-200/25 bg-[#050608] shadow-[0_0_28px_rgba(14,165,233,0.16)]">
         <div className="absolute inset-2 rounded-full bg-emerald-300/80" />
       </div>
       <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/25 to-transparent" />
@@ -16,7 +16,7 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
 
       <div className="flex flex-col gap-6 xl:grid xl:grid-cols-[220px_minmax(0,1fr)]">
         <div>
-          <p className="inline-flex rounded-full border border-emerald-300/15 bg-emerald-400/[0.06] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-200/75">
+          <p className="inline-flex rounded-full border border-emerald-300/15 bg-emerald-400/[0.06] px-3 py-1 text-xs font-semibold tracking-[0.18em] text-emerald-200/75 uppercase">
             {experience.period}
           </p>
           <h3 className="mt-4 text-xl font-semibold tracking-tight text-white">
@@ -35,7 +35,7 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
           </p>
 
           <div className="mt-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
+            <p className="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase">
               Responsibilities
             </p>
           </div>
@@ -52,7 +52,7 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
           </div>
 
           <div className="mt-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
+            <p className="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase">
               Technologies
             </p>
           </div>

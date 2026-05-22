@@ -15,7 +15,7 @@ export function ArchitectureCard({ architecture }: ArchitectureCardProps) {
         <div className="relative">
           <div className="flex items-start justify-between gap-6">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-neutral-500">
+              <p className="text-xs font-semibold tracking-[0.24em] text-neutral-500 uppercase">
                 {architecture.eyebrow}
               </p>
               <h2 className="mt-3 text-lg font-semibold tracking-tight text-white">
@@ -44,7 +44,7 @@ export function ArchitectureCard({ architecture }: ArchitectureCardProps) {
             <div className="rounded-2xl border border-cyan-200/20 bg-cyan-300/[0.06] p-4 shadow-[0_0_70px_rgba(14,165,233,0.11)]">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200/70">
+                  <p className="text-xs font-semibold tracking-[0.22em] text-cyan-200/70 uppercase">
                     {architecture.core.eyebrow}
                   </p>
                   <p className="mt-2 text-base font-semibold text-white">

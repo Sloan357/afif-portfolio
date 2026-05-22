@@ -140,7 +140,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
         <div className="mt-10 grid gap-10 xl:grid-cols-[minmax(0,1fr)_420px] xl:gap-16">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200/70">
+            <p className="text-xs font-semibold tracking-[0.22em] text-emerald-200/70 uppercase">
               {project.type}
             </p>
             <h1 className="mt-5 max-w-4xl text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl md:text-6xl">
@@ -163,7 +163,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <aside className="rounded-2xl border border-white/10 bg-[#08090d]/80 p-6 shadow-2xl shadow-black/30 backdrop-blur">
             <ProjectPreview image={project.coverImage} label={project.title} />
             <div className="border-t border-white/10 pt-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
+              <p className="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase">
                 Role
               </p>
               <p className="mt-3 text-sm leading-6 text-neutral-200">
@@ -173,7 +173,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
             {project.externalLinks.length > 0 ? (
               <div className="mt-6 border-t border-white/10 pt-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
+                <p className="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase">
                   Links
                 </p>
                 <div className="mt-3 flex flex-wrap gap-3">

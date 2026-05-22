@@ -9,7 +9,7 @@ export function CapabilityGrid({ capabilities }: CapabilityGridProps) {
     <div className="mt-10 grid max-w-3xl grid-cols-1 gap-px overflow-hidden rounded-lg border border-white/10 bg-white/10 sm:grid-cols-3 lg:mt-14">
       {capabilities.map((capability) => (
         <div key={capability.label} className="bg-[#08090c]/90 p-5">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-neutral-500">
+          <p className="text-xs font-medium tracking-[0.2em] text-neutral-500 uppercase">
             {capability.label}
           </p>
           <p className="mt-3 text-sm leading-6 text-neutral-200">

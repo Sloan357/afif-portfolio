@@ -23,7 +23,7 @@ export function LabCard({ lab }: LabCardProps) {
         <ProjectPreview image={lab.coverImage} label={lab.title} />
 
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200/70">
+          <p className="text-xs font-semibold tracking-[0.2em] text-emerald-200/70 uppercase">
             {lab.type}
           </p>
           <h3 className="mt-4 text-xl font-semibold tracking-tight text-white transition group-hover:text-cyan-50">
@@ -32,7 +32,7 @@ export function LabCard({ lab }: LabCardProps) {
           <p className="mt-4 text-sm leading-6 text-neutral-400">
             {lab.description}
           </p>
-          <p className="mt-4 text-xs font-medium leading-5 text-cyan-200/70">
+          <p className="mt-4 text-xs leading-5 font-medium text-cyan-200/70">
             {lab.showcase}
           </p>
         </div>
@@ -46,7 +46,7 @@ export function LabCard({ lab }: LabCardProps) {
         {isExpanded ? (
           <div className="mt-6 space-y-5 rounded-xl border border-white/10 bg-white/[0.025] p-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
+              <p className="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase">
                 Concept
               </p>
               <p className="mt-2 text-sm leading-6 text-neutral-300">
@@ -55,7 +55,7 @@ export function LabCard({ lab }: LabCardProps) {
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
+              <p className="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase">
                 Skills demonstrated
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -66,7 +66,7 @@ export function LabCard({ lab }: LabCardProps) {
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
+              <p className="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase">
                 Planned architecture
               </p>
               <ul className="mt-3 space-y-2">
@@ -84,7 +84,7 @@ export function LabCard({ lab }: LabCardProps) {
             />
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
+              <p className="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase">
                 Why it matters
               </p>
               <p className="mt-2 text-sm leading-6 text-neutral-300">

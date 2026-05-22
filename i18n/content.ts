@@ -17,20 +17,24 @@ export type CmsLocalizedContent<TContent extends Record<string, unknown>> = {
   translations: LocalizedContentEntry<TContent>[];
 };
 
-export type ResolvedLocalizedContent<TContent extends Record<string, unknown>> = {
-  content: TContent;
-  requestedLocale: Locale;
-  resolvedLocale: Locale;
-  fallbackLocale: typeof defaultLocale;
-  fallbackUsed: boolean;
-  missingFields: Array<keyof TContent>;
-};
+export type ResolvedLocalizedContent<TContent extends Record<string, unknown>> =
+  {
+    content: TContent;
+    requestedLocale: Locale;
+    resolvedLocale: Locale;
+    fallbackLocale: typeof defaultLocale;
+    fallbackUsed: boolean;
+    missingFields: Array<keyof TContent>;
+  };
 
 type ResolveLocalizedContentOptions = {
   treatEmptyStringAsMissing?: boolean;
 };
 
-function isMissingValue(value: unknown, options: ResolveLocalizedContentOptions) {
+function isMissingValue(
+  value: unknown,
+  options: ResolveLocalizedContentOptions,
+) {
   if (value === null || value === undefined) {
     return true;
   }
@@ -49,13 +53,16 @@ function removeMissingFields<TContent extends Record<string, unknown>>(
   ) as Partial<TContent>;
 }
 
-export function resolveLocalizedContent<TContent extends Record<string, unknown>>(
+export function resolveLocalizedContent<
+  TContent extends Record<string, unknown>,
+>(
   localizedContent: LocalizedContent<TContent>,
   locale: Locale,
   options: ResolveLocalizedContentOptions = {},
 ): ResolvedLocalizedContent<TContent> {
   const englishContent = localizedContent.en;
-  const requestedContent = locale === defaultLocale ? englishContent : localizedContent[locale];
+  const requestedContent =
+    locale === defaultLocale ? englishContent : localizedContent[locale];
 
   if (locale === defaultLocale) {
     return {

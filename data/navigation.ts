@@ -40,7 +40,8 @@ export const navigationContent = {
 };
 
 export function getNavigationData(locale: Locale) {
-  return resolveLocalizedContent<NavigationData>(navigationContent, locale).content;
+  return resolveLocalizedContent<NavigationData>(navigationContent, locale)
+    .content;
 }
 
 export const navigationData = navigationContent.en;

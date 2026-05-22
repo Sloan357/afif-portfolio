@@ -28,13 +28,11 @@ export function ProjectPreview({ image, label }: ProjectPreviewProps) {
         <div className="relative aspect-[16/10] overflow-hidden bg-[#07080b]">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(14,165,233,0.12),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.045),transparent_45%)]" />
           <div className="absolute inset-x-5 top-5 h-px bg-gradient-to-r from-transparent via-cyan-200/25 to-transparent" />
-          <div className="absolute bottom-5 left-5 right-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
+          <div className="absolute right-5 bottom-5 left-5">
+            <p className="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase">
               Preview
             </p>
-            <p className="mt-2 text-sm font-medium text-neutral-300">
-              {label}
-            </p>
+            <p className="mt-2 text-sm font-medium text-neutral-300">{label}</p>
           </div>
         </div>
       )}

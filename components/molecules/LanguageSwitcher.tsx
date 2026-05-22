@@ -32,7 +32,7 @@ export function LanguageSwitcher({
             href={switchLocalePath(pathname, option)}
             onClick={onNavigate}
             aria-current={isActive ? "page" : undefined}
-            className={`rounded-full px-2.5 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.16em] transition ${
+            className={`rounded-full px-2.5 py-1 text-[0.7rem] font-semibold tracking-[0.16em] uppercase transition ${
               isActive
                 ? "bg-white text-neutral-950"
                 : "text-neutral-500 hover:text-white"

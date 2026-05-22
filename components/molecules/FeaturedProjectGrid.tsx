@@ -15,9 +15,7 @@ const allFilter = "All";
 const preferredFilterOrder = [allFilter, "CMS", "AI", "Mobile", "Backend"];
 
 function getProjectFilters(projects: FeaturedProject[]) {
-  const categories = new Set(
-    projects.flatMap((project) => project.categories),
-  );
+  const categories = new Set(projects.flatMap((project) => project.categories));
 
   return [
     allFilter,

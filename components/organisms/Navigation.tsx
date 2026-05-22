@@ -46,8 +46,8 @@ export function Navigation({ locale }: NavigationProps) {
           >
             <span className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-[#050608] text-xs shadow-lg shadow-black/20">
               <span className="font-semibold text-white">A</span>
-              <span className="absolute bottom-1.5 left-1.5 right-1.5 h-0.5 rounded-full bg-emerald-400/80" />
-              <span className="absolute right-1.5 top-1.5 h-2 w-0.5 rotate-[-45deg] rounded-full bg-cyan-300/80" />
+              <span className="absolute right-1.5 bottom-1.5 left-1.5 h-0.5 rounded-full bg-emerald-400/80" />
+              <span className="absolute top-1.5 right-1.5 h-2 w-0.5 rotate-[-45deg] rounded-full bg-cyan-300/80" />
             </span>
             <span>{navigationData.logo.label}</span>
           </a>
@@ -64,7 +64,7 @@ export function Navigation({ locale }: NavigationProps) {
         </div>
 
         {isMenuOpen ? (
-          <div className="mt-4 border-t border-white/10 px-2 pb-4 pt-5 md:hidden">
+          <div className="mt-4 border-t border-white/10 px-2 pt-5 pb-4 md:hidden">
             <div className="flex flex-col gap-5">
               <NavLinks
                 links={navigationData.links}

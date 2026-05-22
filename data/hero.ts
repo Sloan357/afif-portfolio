@@ -89,7 +89,8 @@ export const heroContent: LocalizedContent<HeroData> = {
       label: "Ingenieur logiciel full-stack",
       meta: "APIs, systemes, interfaces",
     },
-    headline: "Je construis des logiciels fiables pour le backend, le web et le mobile.",
+    headline:
+      "Je construis des logiciels fiables pour le backend, le web et le mobile.",
     description:
       "Je suis Afif. Je travaille au plus pres du modele de donnees, des frontieres API et du runtime frontend pour livrer des systemes maintenables en usage reel : Laravel, Symfony, React, React Native et workflows integres a l'IA.",
     ctas: [

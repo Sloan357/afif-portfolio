@@ -14,10 +14,10 @@ export function MenuToggle({ isOpen, onClick }: MenuToggleProps) {
     >
       <span className="relative h-3.5 w-4">
         <span
-          className={`absolute left-0 top-0 h-px w-4 bg-current transition ${isOpen ? "translate-y-[7px] rotate-45" : ""}`}
+          className={`absolute top-0 left-0 h-px w-4 bg-current transition ${isOpen ? "translate-y-[7px] rotate-45" : ""}`}
         />
         <span
-          className={`absolute left-0 top-[7px] h-px w-4 bg-current transition ${isOpen ? "opacity-0" : ""}`}
+          className={`absolute top-[7px] left-0 h-px w-4 bg-current transition ${isOpen ? "opacity-0" : ""}`}
         />
         <span
           className={`absolute bottom-0 left-0 h-px w-4 bg-current transition ${isOpen ? "-translate-y-[7px] -rotate-45" : ""}`}

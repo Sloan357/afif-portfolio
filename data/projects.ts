@@ -48,7 +48,8 @@ export const featuredProjectsData: FeaturedProjectsData = {
     {
       slug: "nam-house-of-sleep",
       title: "Nam House of Sleep",
-      subtitle: "CMS-managed product website for a sleep and home product brand.",
+      subtitle:
+        "CMS-managed product website for a sleep and home product brand.",
       description:
         "Informative website with CMS-managed product pages and a modern product-focused frontend for presenting collections clearly.",
       type: "Product website",
@@ -474,10 +475,8 @@ function getLocalizedProjectSummary(project: FeaturedProject, locale: Locale) {
 
   return {
     ...project,
-    ...resolveLocalizedContent<ProjectSummaryFields>(
-      localizedSummary,
-      locale,
-    ).content,
+    ...resolveLocalizedContent<ProjectSummaryFields>(localizedSummary, locale)
+      .content,
   };
 }
 
