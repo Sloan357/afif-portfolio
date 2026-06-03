@@ -1,14 +1,22 @@
 import { SectionEyebrow } from "@/components/atoms/SectionEyebrow";
 import { FeaturedProjectGrid } from "@/components/molecules/FeaturedProjectGrid";
-import { getFeaturedProjectsData } from "@/data/projects";
+import {
+  getFeaturedProjectsData,
+  type FeaturedProjectsData,
+} from "@/data/projects";
 import type { Locale } from "@/i18n/routing";
 
 type FeaturedProjectsProps = {
   locale: Locale;
+  featuredProjectsData?: FeaturedProjectsData;
 };
 
-export function FeaturedProjects({ locale }: FeaturedProjectsProps) {
-  const featuredProjectsData = getFeaturedProjectsData(locale);
+export function FeaturedProjects({
+  locale,
+  featuredProjectsData,
+}: FeaturedProjectsProps) {
+  const resolvedFeaturedProjectsData =
+    featuredProjectsData ?? getFeaturedProjectsData(locale);
 
   return (
     <section
@@ -18,18 +26,18 @@ export function FeaturedProjects({ locale }: FeaturedProjectsProps) {
       <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent lg:inset-x-12" />
 
       <div className="max-w-3xl">
-        <SectionEyebrow>{featuredProjectsData.eyebrow}</SectionEyebrow>
+        <SectionEyebrow>{resolvedFeaturedProjectsData.eyebrow}</SectionEyebrow>
         <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl md:text-5xl">
-          {featuredProjectsData.title}
+          {resolvedFeaturedProjectsData.title}
         </h2>
         <p className="mt-5 max-w-2xl text-base leading-7 text-neutral-400 sm:text-lg">
-          {featuredProjectsData.description}
+          {resolvedFeaturedProjectsData.description}
         </p>
       </div>
 
       <FeaturedProjectGrid
-        projects={featuredProjectsData.projects}
-        categoryLabels={featuredProjectsData.categoryLabels}
+        projects={resolvedFeaturedProjectsData.projects}
+        categoryLabels={resolvedFeaturedProjectsData.categoryLabels}
         locale={locale}
       />
     </section>

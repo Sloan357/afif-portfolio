@@ -1,14 +1,15 @@
 import { SectionEyebrow } from "@/components/atoms/SectionEyebrow";
 import { ContactActions } from "@/components/molecules/ContactActions";
-import { getContactData } from "@/data/contact";
+import { getContactData, type ContactData } from "@/data/contact";
 import type { Locale } from "@/i18n/routing";
 
 type ContactProps = {
   locale: Locale;
+  contactData?: ContactData;
 };
 
-export function Contact({ locale }: ContactProps) {
-  const contactData = getContactData(locale);
+export function Contact({ locale, contactData }: ContactProps) {
+  const resolvedContactData = contactData ?? getContactData(locale);
 
   return (
     <section
@@ -22,17 +23,17 @@ export function Contact({ locale }: ContactProps) {
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_0%,rgba(14,165,233,0.13),transparent_36%),radial-gradient(circle_at_50%_100%,rgba(34,197,94,0.1),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.045),transparent_45%)]" />
         <div className="absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/35 to-transparent" />
 
-        <SectionEyebrow>{contactData.eyebrow}</SectionEyebrow>
+        <SectionEyebrow>{resolvedContactData.eyebrow}</SectionEyebrow>
         <h2 className="mx-auto mt-5 max-w-4xl text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl md:text-5xl lg:text-6xl">
-          {contactData.title}
+          {resolvedContactData.title}
         </h2>
         <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-neutral-300 sm:text-lg">
-          {contactData.description}
+          {resolvedContactData.description}
         </p>
 
         <ContactActions
-          actions={contactData.actions}
-          interactionLabels={contactData.interactionLabels}
+          actions={resolvedContactData.actions}
+          interactionLabels={resolvedContactData.interactionLabels}
         />
       </div>
     </section>

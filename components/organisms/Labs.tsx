@@ -1,14 +1,15 @@
 import { SectionEyebrow } from "@/components/atoms/SectionEyebrow";
 import { LabCard } from "@/components/molecules/LabCard";
-import { getLabsData } from "@/data/labs";
+import { getLabsData, type LabsDataShape } from "@/data/labs";
 import type { Locale } from "@/i18n/routing";
 
 type LabsProps = {
   locale: Locale;
+  labsData?: LabsDataShape;
 };
 
-export function Labs({ locale }: LabsProps) {
-  const labsData = getLabsData(locale);
+export function Labs({ locale, labsData }: LabsProps) {
+  const resolvedLabsData = labsData ?? getLabsData(locale);
 
   return (
     <section
@@ -19,17 +20,17 @@ export function Labs({ locale }: LabsProps) {
       <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent lg:inset-x-12" />
 
       <div className="max-w-3xl">
-        <SectionEyebrow>{labsData.eyebrow}</SectionEyebrow>
+        <SectionEyebrow>{resolvedLabsData.eyebrow}</SectionEyebrow>
         <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl md:text-5xl">
-          {labsData.title}
+          {resolvedLabsData.title}
         </h2>
         <p className="mt-5 max-w-2xl text-base leading-7 text-neutral-400 sm:text-lg">
-          {labsData.description}
+          {resolvedLabsData.description}
         </p>
       </div>
 
       <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {labsData.labs.map((lab) => (
+        {resolvedLabsData.labs.map((lab) => (
           <LabCard key={lab.slug} lab={lab} />
         ))}
       </div>

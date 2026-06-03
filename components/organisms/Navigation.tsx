@@ -5,15 +5,19 @@ import { usePathname } from "next/navigation";
 import { MenuToggle } from "@/components/atoms/MenuToggle";
 import { NavLinks } from "@/components/molecules/NavLinks";
 import { LanguageSwitcher } from "@/components/molecules/LanguageSwitcher";
-import { getNavigationData } from "@/data/navigation";
+import { getNavigationData, type NavigationData } from "@/data/navigation";
 import { localizedPath, type Locale } from "@/i18n/routing";
 
 type NavigationProps = {
   locale: Locale;
+  navigationData?: NavigationData;
 };
 
-export function Navigation({ locale }: NavigationProps) {
-  const navigationData = useMemo(() => getNavigationData(locale), [locale]);
+export function Navigation({ locale, navigationData }: NavigationProps) {
+  const resolvedNavigationData = useMemo(
+    () => navigationData ?? getNavigationData(locale),
+    [locale, navigationData],
+  );
   const pathname = usePathname();
   const [activeHref, setActiveHref] = useState<string | null>(null);
   const activeNavHref = pathname === `/${locale}` ? activeHref : null;
@@ -27,7 +31,7 @@ export function Navigation({ locale }: NavigationProps) {
       return;
     }
 
-    const sectionLinks = navigationData.links.filter((link) =>
+    const sectionLinks = resolvedNavigationData.links.filter((link) =>
       link.href.startsWith("#"),
     );
     const sections = sectionLinks
@@ -64,7 +68,7 @@ export function Navigation({ locale }: NavigationProps) {
       window.removeEventListener("scroll", updateActiveSection);
       window.removeEventListener("resize", updateActiveSection);
     };
-  }, [locale, navigationData.links, pathname]);
+  }, [locale, resolvedNavigationData.links, pathname]);
 
   useEffect(() => {
     const updateScrollState = () => {
@@ -90,7 +94,7 @@ export function Navigation({ locale }: NavigationProps) {
       >
         <div className="flex items-center justify-between gap-6">
           <a
-            href={localizedPath(locale, navigationData.logo.href)}
+            href={localizedPath(locale, resolvedNavigationData.logo.href)}
             className="inline-flex items-center gap-3 text-sm font-semibold tracking-tight text-white"
             onClick={() => setIsMenuOpen(false)}
           >
@@ -99,12 +103,12 @@ export function Navigation({ locale }: NavigationProps) {
               <span className="absolute right-1.5 bottom-1.5 left-1.5 h-0.5 rounded-full bg-emerald-400/80" />
               <span className="absolute top-1.5 right-1.5 h-2 w-0.5 rotate-[-45deg] rounded-full bg-cyan-300/80" />
             </span>
-            <span>{navigationData.logo.label}</span>
+            <span>{resolvedNavigationData.logo.label}</span>
           </a>
 
           <div className="hidden items-center gap-7 md:flex">
             <NavLinks
-              links={navigationData.links}
+              links={resolvedNavigationData.links}
               locale={locale}
               activeHref={activeNavHref}
             />
@@ -121,7 +125,7 @@ export function Navigation({ locale }: NavigationProps) {
           <div className="mt-4 border-t border-white/10 px-2 pt-5 pb-4 md:hidden">
             <div className="flex flex-col gap-5">
               <NavLinks
-                links={navigationData.links}
+                links={resolvedNavigationData.links}
                 locale={locale}
                 activeHref={activeNavHref}
                 onNavigate={() => setIsMenuOpen(false)}

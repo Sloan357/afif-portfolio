@@ -1,14 +1,15 @@
 import { ArchitectureCard } from "@/components/molecules/ArchitectureCard";
 import { HeroContent } from "@/components/molecules/HeroContent";
-import { getHeroData } from "@/data/hero";
+import { getHeroData, type HeroData } from "@/data/hero";
 import type { Locale } from "@/i18n/routing";
 
 type HeroProps = {
   locale: Locale;
+  heroData?: HeroData;
 };
 
-export function Hero({ locale }: HeroProps) {
-  const heroData = getHeroData(locale);
+export function Hero({ locale, heroData }: HeroProps) {
+  const resolvedHeroData = heroData ?? getHeroData(locale);
 
   return (
     <section className="relative isolate mx-auto flex min-h-screen max-w-7xl flex-col justify-center overflow-hidden px-6 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24">
@@ -18,8 +19,8 @@ export function Hero({ locale }: HeroProps) {
       <div className="absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-b from-transparent to-[#050608]" />
 
       <div className="motion-hero-enter grid items-center gap-10 md:gap-12 xl:grid-cols-[minmax(0,1fr)_430px] xl:gap-16">
-        <HeroContent hero={heroData} />
-        <ArchitectureCard architecture={heroData.architecture} />
+        <HeroContent hero={resolvedHeroData} />
+        <ArchitectureCard architecture={resolvedHeroData.architecture} />
       </div>
     </section>
   );

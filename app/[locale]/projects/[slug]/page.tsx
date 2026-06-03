@@ -5,14 +5,16 @@ import { ProjectPreview } from "@/components/atoms/ProjectPreview";
 import { StructuredData } from "@/components/atoms/StructuredData";
 import { TechTag } from "@/components/atoms/TechTag";
 import { ArchitectureNotes } from "@/components/molecules/ArchitectureNotes";
-import {
-  getFeaturedProjects,
-  getProjectBySlug,
-  type FeaturedProject,
-} from "@/data/projects";
+import { getFeaturedProjects, type FeaturedProject } from "@/data/projects";
 import { createMetadataFromSeo, getLocalizedUrl, getSeoData } from "@/data/seo";
+import { adaptCmsProject } from "@/lib/api/adapters";
+import { getCmsProject } from "@/lib/api/projects";
 import { createProjectJsonLd } from "@/data/structured-data";
-import { isSupportedLocale, supportedLocales } from "@/i18n/routing";
+import {
+  isSupportedLocale,
+  supportedLocales,
+  type Locale,
+} from "@/i18n/routing";
 
 type ProjectPageProps = {
   params: Promise<{
@@ -30,6 +32,12 @@ export function generateStaticParams() {
   );
 }
 
+async function getResolvedProject(locale: Locale, slug: string) {
+  const cmsProject = await getCmsProject(slug, locale);
+
+  return adaptCmsProject(cmsProject, locale, slug);
+}
+
 export async function generateMetadata({
   params,
 }: ProjectPageProps): Promise<Metadata> {
@@ -39,7 +47,7 @@ export async function generateMetadata({
     return {};
   }
 
-  const project = getProjectBySlug(slug);
+  const project = await getResolvedProject(locale, slug);
 
   if (!project) {
     return {};
@@ -118,7 +126,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     notFound();
   }
 
-  const project = getProjectBySlug(slug);
+  const project = await getResolvedProject(locale, slug);
 
   if (!project) {
     notFound();
