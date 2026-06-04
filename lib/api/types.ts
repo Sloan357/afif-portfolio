@@ -1,5 +1,4 @@
 import type { ContactData } from "@/data/contact";
-import type { getExperienceData } from "@/data/experience";
 import type { HeroData } from "@/data/hero";
 import type { LabsDataShape } from "@/data/labs";
 import type { NavigationData } from "@/data/navigation";
@@ -29,7 +28,30 @@ export type ApiFetchOptions = {
   searchParams?: Record<string, boolean | number | string | undefined>;
 };
 
-export type CmsExperienceData = ReturnType<typeof getExperienceData>;
+export type CmsExperienceItem = {
+  role: string;
+  company: string | null;
+  period: string;
+  summary: string;
+  responsibilities: readonly string[];
+  technologies: readonly string[];
+};
+
+export type CmsExperienceData = {
+  eyebrow: string;
+  title: string;
+  introduction: string;
+  focusAreas: readonly string[];
+  experiences: readonly CmsExperienceItem[];
+};
+
+export type CmsExperiencePayload = Record<string, unknown>;
+
+export type CmsExperienceResponse =
+  | CmsExperiencePayload
+  | {
+      experience?: CmsExperiencePayload;
+    };
 
 export type CmsLabPayload = Record<string, unknown> & { slug?: string };
 

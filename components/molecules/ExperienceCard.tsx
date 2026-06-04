@@ -1,8 +1,8 @@
 import { TechTag } from "@/components/atoms/TechTag";
-import type { ExperienceData } from "@/data/experience";
+import type { CmsExperienceData } from "@/lib/api/types";
 
 type ExperienceCardProps = {
-  experience: ExperienceData["experiences"][number];
+  experience: CmsExperienceData["experiences"][number];
 };
 
 export function ExperienceCard({ experience }: ExperienceCardProps) {

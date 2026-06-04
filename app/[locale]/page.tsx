@@ -8,10 +8,12 @@ import { Contact } from "@/components/organisms/Contact";
 import { StructuredData } from "@/components/atoms/StructuredData";
 import { createHomepageJsonLd } from "@/data/structured-data";
 import {
+  adaptCmsExperience,
   adaptCmsHome,
   adaptCmsLabs,
   adaptCmsProjects,
 } from "@/lib/api/adapters";
+import { getCmsExperience } from "@/lib/api/experience";
 import { getCmsHome } from "@/lib/api/home";
 import { getCmsLabs } from "@/lib/api/labs";
 import { getCmsProjects } from "@/lib/api/projects";
@@ -34,10 +36,11 @@ export default async function Home({ params }: HomePageProps) {
     notFound();
   }
 
-  const [cmsHome, cmsProjects, cmsLabs] = await Promise.all([
+  const [cmsHome, cmsProjects, cmsLabs, cmsExperience] = await Promise.all([
     getCmsHome(locale),
     getCmsProjects(locale),
     getCmsLabs(locale),
+    getCmsExperience(locale),
   ]);
   const homeData = adaptCmsHome(cmsHome, locale);
   const featuredProjectsData = adaptCmsProjects(
@@ -46,6 +49,11 @@ export default async function Home({ params }: HomePageProps) {
     homeData.featuredProjects,
   );
   const labsData = adaptCmsLabs(cmsLabs, locale, homeData.labs);
+  const experienceData = adaptCmsExperience(
+    cmsExperience,
+    locale,
+    homeData.experience,
+  );
 
   if (!cmsHome && process.env.NODE_ENV === "development") {
     console.info(
@@ -63,7 +71,7 @@ export default async function Home({ params }: HomePageProps) {
         featuredProjectsData={featuredProjectsData}
       />
       <Labs locale={locale} labsData={labsData} />
-      <Experience locale={locale} experienceData={homeData.experience} />
+      <Experience locale={locale} experienceData={experienceData} />
       <Contact locale={locale} contactData={homeData.contact} />
     </main>
   );

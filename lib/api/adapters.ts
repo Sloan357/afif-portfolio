@@ -11,6 +11,9 @@ import {
 } from "@/data/projects";
 import { getSeoData } from "@/data/seo";
 import type {
+  CmsExperienceData,
+  CmsExperiencePayload,
+  CmsExperienceResponse,
   CmsHomeResponse,
   CmsLabPayload,
   CmsLabsResponse,
@@ -416,6 +419,218 @@ function normalizeProjectShape(project: FeaturedProject, fallbackSlug: string) {
       href: typeof ctaHref === "string" ? ctaHref : `/projects/${slug}`,
     },
   } satisfies FeaturedProject;
+}
+
+function readFirstCmsField(source: Record<string, unknown>, keys: string[]) {
+  for (const key of keys) {
+    const field = readCmsField(source, key);
+
+    if (field.found) {
+      return field.value;
+    }
+  }
+
+  return undefined;
+}
+
+function formatExperiencePeriod(experience: Record<string, unknown>) {
+  const period = readFirstCmsField(experience, [
+    "period",
+    "periodDisplay",
+    "dateDisplay",
+    "dateRange",
+  ]);
+
+  if (typeof period === "string" && period.trim()) {
+    return period;
+  }
+
+  const startDate = readFirstCmsField(experience, [
+    "startDate",
+    "startedAt",
+    "from",
+    "startYear",
+  ]);
+  const endDate = readFirstCmsField(experience, [
+    "endDate",
+    "endedAt",
+    "to",
+    "endYear",
+  ]);
+  const isCurrent = readFirstCmsField(experience, ["isCurrent", "current"]);
+
+  if (typeof startDate === "string" || typeof startDate === "number") {
+    const endDisplay =
+      isCurrent === true
+        ? "Present"
+        : typeof endDate === "string" || typeof endDate === "number"
+          ? String(endDate)
+          : "Present";
+
+    return `${startDate} to ${endDisplay}`;
+  }
+
+  return "";
+}
+
+function readExperiencePayload(cmsExperience: CmsExperienceResponse | null) {
+  if (!isRecord(cmsExperience)) {
+    return null;
+  }
+
+  const experience = readCmsField(cmsExperience, "experience");
+
+  if (isRecord(experience.value)) {
+    return experience.value as CmsExperiencePayload;
+  }
+
+  return cmsExperience as CmsExperiencePayload;
+}
+
+function readExperienceItems(cmsExperience: Record<string, unknown>) {
+  const experiences = readFirstCmsField(cmsExperience, [
+    "experiences",
+    "items",
+    "timeline",
+    "roles",
+  ]);
+
+  return Array.isArray(experiences) ? experiences : null;
+}
+
+function prepareCmsExperienceItem(item: unknown) {
+  if (!isRecord(item)) {
+    return item;
+  }
+
+  const preparedItem = { ...item };
+  const role = readFirstCmsField(preparedItem, ["role", "title", "position"]);
+  const technologies = readFirstCmsField(preparedItem, [
+    "technologies",
+    "stack",
+    "techStack",
+  ]);
+  const responsibilities = readFirstCmsField(preparedItem, [
+    "responsibilities",
+    "responsibilityItems",
+    "highlights",
+    "items",
+  ]);
+  const summary = readFirstCmsField(preparedItem, [
+    "summary",
+    "description",
+    "intro",
+  ]);
+
+  if (!readCmsField(preparedItem, "role").found && typeof role === "string") {
+    preparedItem.role = role;
+  }
+
+  if (
+    !readCmsField(preparedItem, "technologies").found &&
+    Array.isArray(technologies)
+  ) {
+    preparedItem.technologies = technologies;
+  }
+
+  if (
+    !readCmsField(preparedItem, "responsibilities").found &&
+    Array.isArray(responsibilities)
+  ) {
+    preparedItem.responsibilities = responsibilities;
+  }
+
+  if (
+    !readCmsField(preparedItem, "summary").found &&
+    typeof summary === "string"
+  ) {
+    preparedItem.summary = summary;
+  }
+
+  if (!readCmsField(preparedItem, "period").found) {
+    preparedItem.period = formatExperiencePeriod(preparedItem);
+  }
+
+  return preparedItem;
+}
+
+function prepareCmsExperiencePayload(cmsExperience: CmsExperiencePayload) {
+  const preparedExperience = { ...cmsExperience };
+  const experiences = readExperienceItems(preparedExperience);
+
+  if (experiences) {
+    preparedExperience.experiences = experiences.map(prepareCmsExperienceItem);
+  }
+
+  return preparedExperience;
+}
+
+function normalizeExperienceItem(item: unknown, index: number) {
+  const experience = isRecord(item) ? item : {};
+  const company = readCmsField(experience, "company").value;
+
+  return {
+    role:
+      typeof readCmsField(experience, "role").value === "string"
+        ? (readCmsField(experience, "role").value as string)
+        : `Experience ${index + 1}`,
+    company: typeof company === "string" && company.trim() ? company : null,
+    period:
+      typeof readCmsField(experience, "period").value === "string"
+        ? (readCmsField(experience, "period").value as string)
+        : "",
+    summary:
+      typeof readCmsField(experience, "summary").value === "string"
+        ? (readCmsField(experience, "summary").value as string)
+        : "",
+    responsibilities: toStringArray(
+      readCmsField(experience, "responsibilities").value,
+    ),
+    technologies: toStringArray(readCmsField(experience, "technologies").value),
+  };
+}
+
+function normalizeExperienceShape(experienceData: CmsExperienceData) {
+  return {
+    ...experienceData,
+    eyebrow: experienceData.eyebrow || "About / Experience",
+    title: experienceData.title || "Experience",
+    introduction: experienceData.introduction || "",
+    focusAreas: toStringArray(experienceData.focusAreas),
+    experiences: Array.isArray(experienceData.experiences)
+      ? experienceData.experiences.map(normalizeExperienceItem)
+      : [],
+  } as CmsExperienceData;
+}
+
+export function adaptCmsExperience(
+  cmsExperience: CmsExperienceResponse | null,
+  locale: Locale,
+  fallbackExperienceData?: CmsExperienceData,
+): CmsExperienceData {
+  const staticExperienceData =
+    fallbackExperienceData ?? getExperienceData(locale);
+  const logger = createFallbackLogger(locale, "Experience adapter");
+  const experience = readExperiencePayload(cmsExperience);
+
+  if (!experience) {
+    logger.add("experience");
+    logger.flush();
+
+    return staticExperienceData;
+  }
+
+  const preparedExperience = prepareCmsExperiencePayload(experience);
+  const adaptedExperience = mergeWithStaticShape(
+    preparedExperience,
+    staticExperienceData,
+    "experience",
+    logger,
+  );
+
+  logger.flush();
+
+  return normalizeExperienceShape(adaptedExperience);
 }
 
 function createEmptyLabFallback(slug: string): LabItem {
