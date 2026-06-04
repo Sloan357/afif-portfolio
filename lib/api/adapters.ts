@@ -1,7 +1,7 @@
 import { getContactData } from "@/data/contact";
 import { getExperienceData } from "@/data/experience";
 import { getHeroData } from "@/data/hero";
-import { getLabsData } from "@/data/labs";
+import { getLabsData, type LabItem, type LabsDataShape } from "@/data/labs";
 import { getNavigationData } from "@/data/navigation";
 import {
   getFeaturedProjectsData,
@@ -12,6 +12,8 @@ import {
 import { getSeoData } from "@/data/seo";
 import type {
   CmsHomeResponse,
+  CmsLabPayload,
+  CmsLabsResponse,
   CmsProjectPayload,
   CmsProjectResponse,
   CmsProjectsResponse,
@@ -414,6 +416,188 @@ function normalizeProjectShape(project: FeaturedProject, fallbackSlug: string) {
       href: typeof ctaHref === "string" ? ctaHref : `/projects/${slug}`,
     },
   } satisfies FeaturedProject;
+}
+
+function createEmptyLabFallback(slug: string): LabItem {
+  return {
+    slug,
+    title: slug,
+    description: "",
+    type: "Lab",
+    coverImage: null,
+    galleryImages: [],
+    stack: [],
+    showcase: "",
+    concept: {
+      summary: "",
+      skillsDemonstrated: [],
+      plannedArchitecture: [],
+      whyItMatters: "",
+      architectureNotes: [],
+    },
+    cta: {
+      label: "View concept",
+      href: "#contact",
+    },
+  };
+}
+
+function readLabsArray(cmsLabs: CmsLabsResponse | null) {
+  if (Array.isArray(cmsLabs)) {
+    return cmsLabs;
+  }
+
+  if (!isRecord(cmsLabs)) {
+    return null;
+  }
+
+  const labs = readCmsField(cmsLabs, "labs");
+
+  if (Array.isArray(labs.value)) {
+    return labs.value as CmsLabPayload[];
+  }
+
+  return null;
+}
+
+function prepareCmsLabPayload(cmsLab: CmsLabPayload): CmsLabPayload {
+  const preparedLab = { ...cmsLab };
+  const stack = readCmsField(preparedLab, "stack");
+  const technologies = readCmsField(preparedLab, "technologies");
+
+  if (!stack.found && Array.isArray(technologies.value)) {
+    preparedLab.stack = technologies.value;
+  }
+
+  const concept = readCmsField(preparedLab, "concept");
+  const architectureNotes = readCmsField(preparedLab, "architectureNotes");
+
+  if (isRecord(concept.value)) {
+    const preparedConcept = { ...concept.value };
+    const skillsDemonstrated = readCmsField(
+      preparedConcept,
+      "skillsDemonstrated",
+    );
+    const conceptTechnologies = readCmsField(preparedConcept, "technologies");
+
+    if (!skillsDemonstrated.found && Array.isArray(conceptTechnologies.value)) {
+      preparedConcept.skillsDemonstrated = conceptTechnologies.value;
+    }
+
+    if (
+      !readCmsField(preparedConcept, "architectureNotes").found &&
+      Array.isArray(architectureNotes.value)
+    ) {
+      preparedConcept.architectureNotes = architectureNotes.value;
+    }
+
+    preparedLab.concept = preparedConcept;
+  } else if (Array.isArray(architectureNotes.value)) {
+    preparedLab.concept = {
+      architectureNotes: architectureNotes.value,
+    };
+  }
+
+  return preparedLab;
+}
+
+function normalizeLabShape(lab: LabItem, fallbackSlug: string) {
+  const slug = lab.slug || fallbackSlug;
+  const cta = isRecord(lab.cta) ? lab.cta : null;
+  const ctaLabel = cta ? readCmsField(cta, "label").value : undefined;
+  const ctaHref = cta ? readCmsField(cta, "href").value : undefined;
+  const concept = isRecord(lab.concept) ? lab.concept : null;
+
+  return {
+    ...lab,
+    slug,
+    title: lab.title || slug,
+    description: lab.description || "",
+    type: lab.type || "Lab",
+    coverImage: normalizeImage(lab.coverImage),
+    galleryImages: normalizeImages(lab.galleryImages),
+    stack: toStringArray(lab.stack),
+    showcase: lab.showcase || "",
+    concept: {
+      summary:
+        concept && typeof readCmsField(concept, "summary").value === "string"
+          ? (readCmsField(concept, "summary").value as string)
+          : "",
+      skillsDemonstrated: toStringArray(
+        concept ? readCmsField(concept, "skillsDemonstrated").value : [],
+      ),
+      plannedArchitecture: toStringArray(
+        concept ? readCmsField(concept, "plannedArchitecture").value : [],
+      ),
+      whyItMatters:
+        concept &&
+        typeof readCmsField(concept, "whyItMatters").value === "string"
+          ? (readCmsField(concept, "whyItMatters").value as string)
+          : "",
+      architectureNotes: normalizeArchitectureNotes(
+        concept ? readCmsField(concept, "architectureNotes").value : [],
+      ),
+    },
+    cta: {
+      label: typeof ctaLabel === "string" ? ctaLabel : "View concept",
+      href: typeof ctaHref === "string" ? ctaHref : "#contact",
+    },
+  } satisfies LabItem;
+}
+
+function getLabFallback(
+  cmsLab: CmsLabPayload,
+  staticLabs: LabItem[],
+  index: number,
+) {
+  if (typeof cmsLab.slug === "string") {
+    return (
+      staticLabs.find((lab) => lab.slug === cmsLab.slug) ??
+      createEmptyLabFallback(cmsLab.slug)
+    );
+  }
+
+  return staticLabs[index] ?? createEmptyLabFallback(`cms-lab-${index}`);
+}
+
+export function adaptCmsLabs(
+  cmsLabs: CmsLabsResponse | null,
+  locale: Locale,
+  fallbackLabsData?: LabsDataShape,
+): LabsDataShape {
+  const staticLabsData = fallbackLabsData ?? getLabsData(locale);
+  const logger = createFallbackLogger(locale, "Labs adapter");
+  const labs = readLabsArray(cmsLabs);
+
+  if (!labs || labs.length === 0) {
+    logger.add("labs.labs");
+    logger.flush();
+
+    return staticLabsData;
+  }
+
+  const adaptedLabs = labs.map((lab, index) => {
+    const preparedLab = prepareCmsLabPayload(lab);
+
+    return normalizeLabShape(
+      mergeWithStaticShape(
+        preparedLab,
+        getLabFallback(preparedLab, staticLabsData.labs, index),
+        `labs.labs[${getArrayItemLabel(preparedLab, index)}]`,
+        logger,
+      ),
+      typeof preparedLab.slug === "string"
+        ? preparedLab.slug
+        : `cms-lab-${index}`,
+    );
+  });
+
+  logger.flush();
+
+  return {
+    ...staticLabsData,
+    labs: adaptedLabs,
+  };
 }
 
 function createEmptyProjectFallback(slug: string): FeaturedProject {

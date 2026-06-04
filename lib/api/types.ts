@@ -31,6 +31,14 @@ export type ApiFetchOptions = {
 
 export type CmsExperienceData = ReturnType<typeof getExperienceData>;
 
+export type CmsLabPayload = Record<string, unknown> & { slug?: string };
+
+export type CmsLabsResponse =
+  | CmsLabPayload[]
+  | {
+      labs?: CmsLabPayload[];
+    };
+
 export type CmsProjectPayload = Partial<FeaturedProject> &
   Record<string, unknown>;
 
