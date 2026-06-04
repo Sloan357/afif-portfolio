@@ -11,6 +11,7 @@ import { adaptCmsProject } from "@/lib/api/adapters";
 import { getCmsProject } from "@/lib/api/projects";
 import { createProjectJsonLd } from "@/data/structured-data";
 import {
+  defaultLocale,
   isSupportedLocale,
   supportedLocales,
   type Locale,
@@ -33,9 +34,14 @@ export function generateStaticParams() {
 }
 
 async function getResolvedProject(locale: Locale, slug: string) {
-  const cmsProject = await getCmsProject(slug, locale);
+  const [cmsProject, cmsProjectMediaFallback] = await Promise.all([
+    getCmsProject(slug, locale),
+    locale === defaultLocale
+      ? Promise.resolve(null)
+      : getCmsProject(slug, defaultLocale),
+  ]);
 
-  return adaptCmsProject(cmsProject, locale, slug);
+  return adaptCmsProject(cmsProject, locale, slug, cmsProjectMediaFallback);
 }
 
 export async function generateMetadata({

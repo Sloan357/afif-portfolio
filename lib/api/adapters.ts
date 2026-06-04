@@ -1131,39 +1131,73 @@ function readProjectPayload(cmsProject: CmsProjectResponse | null) {
   return cmsProject as CmsProjectPayload;
 }
 
+function readCmsProjectMediaSource(cmsProject: Record<string, unknown>) {
+  const coverImage = readCmsField(cmsProject, "coverImage").value;
+  const featuredImage = readCmsField(cmsProject, "featuredImage").value;
+  const seoImage = readCmsField(cmsProject, "seoImage").value;
+
+  if (normalizeImage(coverImage)?.src) {
+    return coverImage;
+  }
+
+  if (normalizeImage(featuredImage)?.src) {
+    return featuredImage;
+  }
+
+  if (normalizeImage(seoImage)?.src) {
+    return seoImage;
+  }
+
+  return null;
+}
+
 function prepareCmsProjectPayload(
   cmsProject: CmsProjectPayload,
+  mediaFallbackProject?: CmsProjectPayload | null,
 ): CmsProjectPayload {
   const preparedProject: Record<string, unknown> = { ...cmsProject };
-  const coverImage = readCmsField(preparedProject, "coverImage");
-  const featuredImage = readCmsField(preparedProject, "featuredImage").value;
-  const seoImage = readCmsField(preparedProject, "seoImage").value;
 
-  if (!coverImage.found || !normalizeImage(coverImage.value)?.src) {
-    if (normalizeImage(featuredImage)?.src) {
-      preparedProject.coverImage = featuredImage;
-    } else if (normalizeImage(seoImage)?.src) {
-      preparedProject.coverImage = seoImage;
+  if (!readCmsProjectMediaSource(preparedProject)) {
+    const fallbackMedia = mediaFallbackProject
+      ? readCmsProjectMediaSource(mediaFallbackProject)
+      : null;
+
+    if (fallbackMedia) {
+      preparedProject.coverImage = fallbackMedia;
     }
+  }
+
+  const mediaSource = readCmsProjectMediaSource(preparedProject);
+
+  if (mediaSource) {
+    preparedProject.coverImage = mediaSource;
   }
 
   return preparedProject as CmsProjectPayload;
 }
 
-function logNamHouseCoverImage(
+function findCmsProjectBySlug(
+  projects: CmsProjectPayload[] | null,
+  slug: string | undefined,
+) {
+  if (!projects || !slug) {
+    return null;
+  }
+
+  return projects.find((project) => project.slug === slug) ?? null;
+}
+
+function logProjectCoverImage(
   project: FeaturedProject,
   locale: Locale,
   context: string,
 ) {
-  if (
-    process.env.NODE_ENV !== "development" ||
-    project.slug !== "nam-house-of-sleep"
-  ) {
+  if (process.env.NODE_ENV !== "development") {
     return;
   }
 
   console.info(
-    `[cms] ${context} Nam House of Sleep coverImage.src for locale "${locale}": ${
+    `[cms] ${context} project "${project.slug}" coverImage.src for locale "${locale}": ${
       project.coverImage?.src ?? "missing"
     }`,
   );
@@ -1190,11 +1224,15 @@ export function adaptCmsProjects(
   cmsProjects: CmsProjectsResponse | null,
   locale: Locale,
   fallbackFeaturedProjectsData?: FeaturedProjectsData,
+  mediaFallbackProjects?: CmsProjectsResponse | null,
 ): FeaturedProjectsData {
   const staticFeaturedProjectsData =
     fallbackFeaturedProjectsData ?? getFeaturedProjectsData(locale);
   const logger = createFallbackLogger(locale, "Projects adapter");
   const projects = readProjectsArray(cmsProjects);
+  const mediaFallbackProjectItems = readProjectsArray(
+    mediaFallbackProjects ?? null,
+  );
 
   if (!projects || projects.length === 0) {
     logger.add("featuredProjects.projects");
@@ -1204,7 +1242,10 @@ export function adaptCmsProjects(
   }
 
   const adaptedProjects = projects.map((project, index) => {
-    const preparedProject = prepareCmsProjectPayload(project);
+    const preparedProject = prepareCmsProjectPayload(
+      project,
+      findCmsProjectBySlug(mediaFallbackProjectItems, project.slug),
+    );
     const adaptedProject = normalizeProjectShape(
       mergeWithStaticShape(
         preparedProject,
@@ -1221,7 +1262,7 @@ export function adaptCmsProjects(
         : `cms-project-${index}`,
     );
 
-    logNamHouseCoverImage(adaptedProject, locale, "Projects adapter");
+    logProjectCoverImage(adaptedProject, locale, "Projects adapter");
 
     return adaptedProject;
   });
@@ -1238,9 +1279,11 @@ export function adaptCmsProject(
   cmsProject: CmsProjectResponse | null,
   locale: Locale,
   slug: string,
+  mediaFallbackProject?: CmsProjectResponse | null,
 ): FeaturedProject | null {
   const staticProject = getProjectBySlug(slug);
   const project = readProjectPayload(cmsProject);
+  const fallbackProject = readProjectPayload(mediaFallbackProject ?? null);
 
   if (!project) {
     if (staticProject) {
@@ -1259,7 +1302,7 @@ export function adaptCmsProject(
     locale,
     `Project detail adapter (${slug})`,
   );
-  const preparedProject = prepareCmsProjectPayload(project);
+  const preparedProject = prepareCmsProjectPayload(project, fallbackProject);
   const adaptedProject = normalizeProjectShape(
     mergeWithStaticShape(
       preparedProject,
@@ -1270,7 +1313,7 @@ export function adaptCmsProject(
     slug,
   );
 
-  logNamHouseCoverImage(
+  logProjectCoverImage(
     adaptedProject,
     locale,
     `Project detail adapter (${slug})`,

@@ -17,7 +17,11 @@ import { getCmsExperience } from "@/lib/api/experience";
 import { getCmsHome } from "@/lib/api/home";
 import { getCmsLabs } from "@/lib/api/labs";
 import { getCmsProjects } from "@/lib/api/projects";
-import { isSupportedLocale, supportedLocales } from "@/i18n/routing";
+import {
+  defaultLocale,
+  isSupportedLocale,
+  supportedLocales,
+} from "@/i18n/routing";
 
 export function generateStaticParams() {
   return supportedLocales.map((locale) => ({ locale }));
@@ -36,9 +40,18 @@ export default async function Home({ params }: HomePageProps) {
     notFound();
   }
 
-  const [cmsHome, cmsProjects, cmsLabs, cmsExperience] = await Promise.all([
+  const [
+    cmsHome,
+    cmsProjects,
+    cmsProjectMediaFallback,
+    cmsLabs,
+    cmsExperience,
+  ] = await Promise.all([
     getCmsHome(locale),
     getCmsProjects(locale),
+    locale === defaultLocale
+      ? Promise.resolve(null)
+      : getCmsProjects(defaultLocale),
     getCmsLabs(locale),
     getCmsExperience(locale),
   ]);
@@ -47,6 +60,7 @@ export default async function Home({ params }: HomePageProps) {
     cmsProjects,
     locale,
     homeData.featuredProjects,
+    cmsProjectMediaFallback,
   );
   const labsData = adaptCmsLabs(cmsLabs, locale, homeData.labs);
   const experienceData = adaptCmsExperience(
