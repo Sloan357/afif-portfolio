@@ -10,6 +10,7 @@ import {
   type FeaturedProjectsData,
 } from "@/data/projects";
 import { getSeoData } from "@/data/seo";
+import type { CmsLink } from "@/data/types";
 import type {
   CmsExperienceData,
   CmsExperiencePayload,
@@ -207,6 +208,187 @@ function mergeWithStaticShape<TFallback>(
   return (cmsValue ?? fallbackValue) as TFallback;
 }
 
+function readCmsArrayField(source: Record<string, unknown>, key: string) {
+  const field = readCmsField(source, key);
+
+  return Array.isArray(field.value) ? field.value : null;
+}
+
+function readCmsBooleanField(
+  source: Record<string, unknown>,
+  key: string,
+  fallback: boolean,
+) {
+  const value = readCmsField(source, key).value;
+
+  return typeof value === "boolean" ? value : fallback;
+}
+
+function inferContactLinkType(link: Record<string, unknown>) {
+  const explicitType = readCmsField(link, "type").value;
+
+  if (typeof explicitType === "string" && explicitType.trim()) {
+    return explicitType.toLowerCase();
+  }
+
+  const label = readCmsField(link, "label").value;
+  const href = readCmsField(link, "href").value;
+  const haystack = `${typeof label === "string" ? label : ""} ${
+    typeof href === "string" ? href : ""
+  }`.toLowerCase();
+
+  if (haystack.includes("github")) {
+    return "github";
+  }
+
+  if (haystack.includes("linkedin")) {
+    return "linkedin";
+  }
+
+  if (haystack.includes("mailto:") || haystack.includes("email")) {
+    return "email";
+  }
+
+  if (haystack.includes("cv") || haystack.includes("resume")) {
+    return "cv";
+  }
+
+  if (haystack.includes("calendly") || haystack.includes("book")) {
+    return "booking";
+  }
+
+  return "link";
+}
+
+function getContactLinkHref(link: Record<string, unknown>, type: string) {
+  const href = readCmsField(link, "href").value;
+  const url = readCmsField(link, "url").value;
+  const email = readCmsField(link, "email").value;
+
+  if (typeof href === "string" && href.trim()) {
+    return href;
+  }
+
+  if (typeof url === "string" && url.trim()) {
+    return url;
+  }
+
+  if (type === "email" && typeof email === "string" && email.trim()) {
+    return email.startsWith("mailto:") ? email : `mailto:${email}`;
+  }
+
+  return null;
+}
+
+function getContactLinkLabel(link: Record<string, unknown>, type: string) {
+  const label = readCmsField(link, "label").value;
+
+  if (typeof label === "string" && label.trim()) {
+    return label;
+  }
+
+  const fallbackLabels: Record<string, string> = {
+    email: "Email me",
+    github: "GitHub",
+    linkedin: "LinkedIn",
+    cv: "Download CV",
+    booking: "Book a call",
+  };
+
+  return fallbackLabels[type] ?? "Link";
+}
+
+function normalizeContactLink(
+  link: unknown,
+  defaultVisible: boolean,
+): CmsLink | null {
+  if (!isRecord(link)) {
+    return null;
+  }
+
+  const type = inferContactLinkType(link);
+  const href = getContactLinkHref(link, type);
+
+  if (!href) {
+    return null;
+  }
+
+  const isExternal =
+    readCmsField(link, "isExternal").value ??
+    readCmsField(link, "external").value;
+  const opensInNewTab =
+    readCmsField(link, "opensInNewTab").value ??
+    readCmsField(link, "newTab").value;
+  const isPrimary = readCmsField(link, "isPrimary").value;
+
+  return {
+    label: getContactLinkLabel(link, type),
+    href,
+    type,
+    isExternal:
+      typeof isExternal === "boolean"
+        ? isExternal
+        : href.startsWith("http://") || href.startsWith("https://"),
+    opensInNewTab:
+      typeof opensInNewTab === "boolean"
+        ? opensInNewTab
+        : href.startsWith("http://") || href.startsWith("https://"),
+    isVisible: readCmsBooleanField(link, "isVisible", defaultVisible),
+    ...(typeof isPrimary === "boolean" ? { isPrimary } : {}),
+  } satisfies CmsLink;
+}
+
+function mergeCmsContactSettings(
+  cmsHome: CmsHomeResponse,
+  contactData: HomePageData["contact"],
+  locale: Locale,
+) {
+  const logger = createFallbackLogger(locale, "Contact settings adapter");
+  const settings = readCmsField(
+    cmsHome as Record<string, unknown>,
+    "settings",
+  ).value;
+
+  if (!isRecord(settings)) {
+    logger.add("settings");
+    logger.flush();
+
+    return contactData;
+  }
+
+  const socialLinks = readCmsArrayField(settings, "socialLinks");
+
+  if (!socialLinks || socialLinks.length === 0) {
+    logger.add("settings.socialLinks");
+    logger.flush();
+
+    return contactData;
+  }
+
+  const contactLinks = readCmsArrayField(settings, "contactLinks") ?? [];
+  const visibleContactLinks = contactLinks.filter(
+    (link) => isRecord(link) && readCmsBooleanField(link, "isVisible", false),
+  );
+  const cmsActions = [
+    ...socialLinks.map((link) => normalizeContactLink(link, true)),
+    ...visibleContactLinks.map((link) => normalizeContactLink(link, true)),
+  ].filter((link): link is CmsLink => Boolean(link));
+
+  if (cmsActions.length === 0) {
+    logger.add("settings.socialLinks.actions");
+    logger.flush();
+
+    return contactData;
+  }
+
+  logger.flush();
+
+  return {
+    ...contactData,
+    actions: cmsActions,
+  };
+}
+
 function readHomeSection(
   cmsHome: CmsHomeResponse,
   key: keyof HomePageData,
@@ -279,11 +461,15 @@ export function adaptCmsHome(
       "experience",
       logger,
     ),
-    contact: mergeWithStaticShape(
-      readHomeSection(cmsHome, "contact"),
-      staticHomeData.contact,
-      "contact",
-      logger,
+    contact: mergeCmsContactSettings(
+      cmsHome,
+      mergeWithStaticShape(
+        readHomeSection(cmsHome, "contact"),
+        staticHomeData.contact,
+        "contact",
+        logger,
+      ),
+      locale,
     ),
     seo: mergeWithStaticShape(
       readHomeSection(cmsHome, "seo"),

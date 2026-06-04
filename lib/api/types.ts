@@ -28,6 +28,15 @@ export type ApiFetchOptions = {
   searchParams?: Record<string, boolean | number | string | undefined>;
 };
 
+export type CmsSettingsLinkPayload = Record<string, unknown>;
+
+export type CmsSiteSettingsPayload = {
+  socialLinks?: CmsSettingsLinkPayload[];
+  social_links?: CmsSettingsLinkPayload[];
+  contactLinks?: CmsSettingsLinkPayload[];
+  contact_links?: CmsSettingsLinkPayload[];
+} & Record<string, unknown>;
+
 export type CmsExperienceItem = {
   role: string;
   company: string | null;
@@ -91,6 +100,7 @@ export type CmsHomeResponse = {
   experience?: CmsExperienceData;
   contact?: ContactData;
   seo?: SeoData;
+  settings?: CmsSiteSettingsPayload;
 };
 
 export type HomePageData = {
