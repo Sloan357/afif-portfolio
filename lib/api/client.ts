@@ -1,4 +1,4 @@
-import { cmsApiBaseUrl, cmsApiRevalidateSeconds } from "@/config/cms";
+import { cmsApiBaseUrl, cmsApiCacheConfig } from "@/config/cms";
 import type { ApiEnvelope, ApiFetchOptions } from "@/lib/api/types";
 
 function normalizeApiPath(path: string) {
@@ -53,7 +53,7 @@ export async function fetchApi<TData>(
         Accept: "application/json",
       },
       next: {
-        revalidate: options.revalidate ?? cmsApiRevalidateSeconds,
+        revalidate: options.revalidate ?? cmsApiCacheConfig.revalidate,
       },
     });
 

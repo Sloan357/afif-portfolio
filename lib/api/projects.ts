@@ -1,23 +1,35 @@
-import { cmsApiRevalidateSeconds } from "@/config/cms";
 import { fetchApi } from "@/lib/api/client";
-import type { CmsProjectResponse, CmsProjectsResponse } from "@/lib/api/types";
+import type {
+  ApiFetchOptions,
+  CmsProjectResponse,
+  CmsProjectsResponse,
+} from "@/lib/api/types";
 import type { Locale } from "@/i18n/routing";
 
-export async function getCmsProjects(locale: Locale) {
+type CmsRequestOptions = Pick<ApiFetchOptions, "revalidate">;
+
+export async function getCmsProjects(
+  locale: Locale,
+  options: CmsRequestOptions = {},
+) {
   const response = await fetchApi<CmsProjectsResponse>("/api/v1/projects", {
     locale,
-    revalidate: cmsApiRevalidateSeconds,
+    ...options,
   });
 
   return response?.data ?? null;
 }
 
-export async function getCmsProject(slug: string, locale: Locale) {
+export async function getCmsProject(
+  slug: string,
+  locale: Locale,
+  options: CmsRequestOptions = {},
+) {
   const response = await fetchApi<CmsProjectResponse>(
     `/api/v1/projects/${encodeURIComponent(slug)}`,
     {
       locale,
-      revalidate: cmsApiRevalidateSeconds,
+      ...options,
     },
   );
 
