@@ -1,3 +1,4 @@
+import { cmsAssetBaseUrl } from "@/config/cms";
 import { getContactData } from "@/data/contact";
 import { getExperienceData } from "@/data/experience";
 import { getHeroData } from "@/data/hero";
@@ -492,19 +493,76 @@ function toStringArray(value: unknown): string[] {
   return value.filter((item): item is string => typeof item === "string");
 }
 
+function readFirstStringField(source: Record<string, unknown>, keys: string[]) {
+  const value = readFirstCmsField(source, keys);
+
+  return typeof value === "string" && value.trim() ? value : null;
+}
+
+function resolveCmsAssetUrl(src: string | null) {
+  if (!src) {
+    return null;
+  }
+
+  if (/^(https?:|data:|blob:)/.test(src)) {
+    return src;
+  }
+
+  if (src.startsWith("//")) {
+    return `https:${src}`;
+  }
+
+  if (!cmsAssetBaseUrl) {
+    return src;
+  }
+
+  try {
+    return new URL(src, `${cmsAssetBaseUrl}/`).toString();
+  } catch {
+    return src;
+  }
+}
+
 function normalizeImage(value: unknown) {
   if (!isRecord(value)) {
     return null;
   }
 
-  const src = readCmsField(value, "src").value;
-  const alt = readCmsField(value, "alt").value;
+  const src = resolveCmsAssetUrl(
+    readFirstStringField(value, [
+      "src",
+      "url",
+      "originalUrl",
+      "previewUrl",
+      "path",
+    ]),
+  );
+  const alt = readFirstStringField(value, ["alt", "altText", "name", "title"]);
   const variants = readCmsField(value, "variants").value;
+  const conversions = readCmsField(value, "conversions").value;
+  const desktopVariant = isRecord(variants)
+    ? resolveCmsAssetUrl(
+        readFirstStringField(variants, ["desktop", "large", "preview"]),
+      )
+    : null;
+  const desktopConversion = isRecord(conversions)
+    ? resolveCmsAssetUrl(
+        readFirstStringField(conversions, ["desktop", "large", "preview"]),
+      )
+    : null;
 
   return {
-    src: typeof src === "string" ? src : null,
-    alt: typeof alt === "string" ? alt : "Project preview",
-    ...(isRecord(variants) ? { variants } : {}),
+    src,
+    alt: alt ?? "Project preview",
+    ...(desktopVariant || desktopConversion
+      ? {
+          variants: {
+            desktop: desktopVariant ?? desktopConversion,
+          },
+        }
+      : isRecord(variants)
+        ? { variants }
+        : {}),
   };
 }
 
@@ -581,6 +639,10 @@ function normalizeExternalLinks(value: unknown) {
 function normalizeProjectShape(project: FeaturedProject, fallbackSlug: string) {
   const slug = project.slug || fallbackSlug;
   const cta = isRecord(project.cta) ? project.cta : null;
+  const coverImage =
+    normalizeImage(project.coverImage) ??
+    normalizeImage(readCmsField(project, "featuredImage").value) ??
+    normalizeImage(readCmsField(project, "seoImage").value);
   const ctaLabel = cta ? readCmsField(cta, "label").value : undefined;
   const ctaHref = cta ? readCmsField(cta, "href").value : undefined;
 
@@ -592,7 +654,7 @@ function normalizeProjectShape(project: FeaturedProject, fallbackSlug: string) {
     description: project.description || "",
     type: project.type || "Project",
     categories: toStringArray(project.categories),
-    coverImage: normalizeImage(project.coverImage),
+    coverImage,
     galleryImages: normalizeImages(project.galleryImages),
     stack: toStringArray(project.stack),
     role: project.role || "",
@@ -1069,6 +1131,44 @@ function readProjectPayload(cmsProject: CmsProjectResponse | null) {
   return cmsProject as CmsProjectPayload;
 }
 
+function prepareCmsProjectPayload(
+  cmsProject: CmsProjectPayload,
+): CmsProjectPayload {
+  const preparedProject: Record<string, unknown> = { ...cmsProject };
+  const coverImage = readCmsField(preparedProject, "coverImage");
+  const featuredImage = readCmsField(preparedProject, "featuredImage").value;
+  const seoImage = readCmsField(preparedProject, "seoImage").value;
+
+  if (!coverImage.found || !normalizeImage(coverImage.value)?.src) {
+    if (normalizeImage(featuredImage)?.src) {
+      preparedProject.coverImage = featuredImage;
+    } else if (normalizeImage(seoImage)?.src) {
+      preparedProject.coverImage = seoImage;
+    }
+  }
+
+  return preparedProject as CmsProjectPayload;
+}
+
+function logNamHouseCoverImage(
+  project: FeaturedProject,
+  locale: Locale,
+  context: string,
+) {
+  if (
+    process.env.NODE_ENV !== "development" ||
+    project.slug !== "nam-house-of-sleep"
+  ) {
+    return;
+  }
+
+  console.info(
+    `[cms] ${context} Nam House of Sleep coverImage.src for locale "${locale}": ${
+      project.coverImage?.src ?? "missing"
+    }`,
+  );
+}
+
 function getProjectFallback(
   cmsProject: CmsProjectPayload,
   staticProjects: FeaturedProject[],
@@ -1103,17 +1203,28 @@ export function adaptCmsProjects(
     return staticFeaturedProjectsData;
   }
 
-  const adaptedProjects = projects.map((project, index) =>
-    normalizeProjectShape(
+  const adaptedProjects = projects.map((project, index) => {
+    const preparedProject = prepareCmsProjectPayload(project);
+    const adaptedProject = normalizeProjectShape(
       mergeWithStaticShape(
-        project,
-        getProjectFallback(project, staticFeaturedProjectsData.projects, index),
-        `featuredProjects.projects[${getArrayItemLabel(project, index)}]`,
+        preparedProject,
+        getProjectFallback(
+          preparedProject,
+          staticFeaturedProjectsData.projects,
+          index,
+        ),
+        `featuredProjects.projects[${getArrayItemLabel(preparedProject, index)}]`,
         logger,
       ),
-      typeof project.slug === "string" ? project.slug : `cms-project-${index}`,
-    ),
-  );
+      typeof preparedProject.slug === "string"
+        ? preparedProject.slug
+        : `cms-project-${index}`,
+    );
+
+    logNamHouseCoverImage(adaptedProject, locale, "Projects adapter");
+
+    return adaptedProject;
+  });
 
   logger.flush();
 
@@ -1148,14 +1259,21 @@ export function adaptCmsProject(
     locale,
     `Project detail adapter (${slug})`,
   );
+  const preparedProject = prepareCmsProjectPayload(project);
   const adaptedProject = normalizeProjectShape(
     mergeWithStaticShape(
-      project,
+      preparedProject,
       staticProject ?? createEmptyProjectFallback(slug),
       `projects.${slug}`,
       logger,
     ),
     slug,
+  );
+
+  logNamHouseCoverImage(
+    adaptedProject,
+    locale,
+    `Project detail adapter (${slug})`,
   );
 
   logger.flush();

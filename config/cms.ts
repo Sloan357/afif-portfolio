@@ -9,6 +9,25 @@ function normalizeCmsApiBaseUrl(url: string | undefined) {
   return url.replace(/\/$/, "");
 }
 
+function getCmsAssetBaseUrl(apiBaseUrl: string | null) {
+  if (!apiBaseUrl) {
+    return null;
+  }
+
+  try {
+    const url = new URL(apiBaseUrl);
+    url.pathname = url.pathname
+      .replace(/\/api\/v1\/?$/, "")
+      .replace(/\/api\/?$/, "");
+    url.search = "";
+    url.hash = "";
+
+    return url.toString().replace(/\/$/, "");
+  } catch {
+    return null;
+  }
+}
+
 function getDefaultRevalidateSeconds() {
   return process.env.NODE_ENV === "production"
     ? productionCmsApiRevalidateSeconds
@@ -36,6 +55,8 @@ export const cmsApiBaseUrl = normalizeCmsApiBaseUrl(
 export const cmsApiRevalidateSeconds = parseRevalidateSeconds(
   process.env.CMS_API_REVALIDATE_SECONDS,
 );
+
+export const cmsAssetBaseUrl = getCmsAssetBaseUrl(cmsApiBaseUrl);
 
 export const cmsApiCacheConfig = {
   revalidate: cmsApiRevalidateSeconds,
