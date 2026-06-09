@@ -390,6 +390,305 @@ function mergeCmsContactSettings(
   };
 }
 
+function readNestedCmsField(source: Record<string, unknown>, path: string) {
+  return path.split(".").reduce<unknown>((currentValue, key) => {
+    if (!isRecord(currentValue)) {
+      return undefined;
+    }
+
+    const field = readCmsField(currentValue, key);
+
+    return field.found ? field.value : undefined;
+  }, source);
+}
+
+function readFirstCmsValue(source: Record<string, unknown>, keys: string[]) {
+  for (const key of keys) {
+    const value = key.includes(".")
+      ? readNestedCmsField(source, key)
+      : readCmsField(source, key).value;
+
+    if (value !== undefined && value !== null) {
+      return value;
+    }
+  }
+
+  return undefined;
+}
+
+function readFirstCmsString(source: Record<string, unknown>, keys: string[]) {
+  const value = readFirstCmsValue(source, keys);
+
+  return typeof value === "string" && value.trim() ? value : undefined;
+}
+
+function readFirstCmsArray(source: Record<string, unknown>, keys: string[]) {
+  const value = readFirstCmsValue(source, keys);
+
+  return Array.isArray(value) ? value : undefined;
+}
+
+function normalizeLabelValueItems(value: unknown) {
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+
+  const items = value.flatMap((item) => {
+    if (typeof item === "string" && item.trim()) {
+      return [{ label: item, value: "" }];
+    }
+
+    if (!isRecord(item)) {
+      return [];
+    }
+
+    const label = readFirstCmsString(item, ["label", "title", "name", "key"]);
+    const itemValue = readFirstCmsString(item, [
+      "value",
+      "description",
+      "text",
+      "summary",
+      "content",
+    ]);
+
+    if (!label && !itemValue) {
+      return [];
+    }
+
+    return [
+      {
+        label: label ?? "",
+        value: itemValue ?? "",
+      },
+    ];
+  });
+
+  return items.length > 0 ? items : undefined;
+}
+
+function normalizeHeroCta(
+  item: unknown,
+  fallbackVariant: "primary" | "secondary",
+) {
+  if (!isRecord(item)) {
+    return null;
+  }
+
+  const label = readFirstCmsString(item, ["label", "title", "text", "name"]);
+  const href = readFirstCmsString(item, ["href", "url", "link", "target"]);
+  const variant = readFirstCmsString(item, ["variant", "style", "type"]);
+  const isPrimary = readCmsField(item, "isPrimary").value;
+
+  if (!label || !href) {
+    return null;
+  }
+
+  return {
+    label,
+    href,
+    variant:
+      variant === "secondary" || isPrimary === false
+        ? "secondary"
+        : variant === "primary" || isPrimary === true
+          ? "primary"
+          : fallbackVariant,
+  };
+}
+
+function normalizeHeroCtas(hero: Record<string, unknown>) {
+  const ctas = readFirstCmsArray(hero, [
+    "ctas",
+    "ctaLinks",
+    "cta_links",
+    "callsToAction",
+    "actions",
+  ]);
+
+  if (ctas) {
+    const normalizedCtas = ctas.flatMap((cta, index) => {
+      const normalizedCta = normalizeHeroCta(
+        cta,
+        index === 0 ? "primary" : "secondary",
+      );
+
+      return normalizedCta ? [normalizedCta] : [];
+    });
+
+    if (normalizedCtas.length > 0) {
+      return normalizedCtas;
+    }
+  }
+
+  const primaryCta = readFirstCmsValue(hero, ["primaryCta", "primary_cta"]);
+  const secondaryCta = readFirstCmsValue(hero, [
+    "secondaryCta",
+    "secondary_cta",
+  ]);
+  const normalizedCtas = [
+    normalizeHeroCta(primaryCta, "primary"),
+    normalizeHeroCta(secondaryCta, "secondary"),
+  ].filter((cta): cta is NonNullable<typeof cta> => Boolean(cta));
+
+  return normalizedCtas.length > 0 ? normalizedCtas : undefined;
+}
+
+function normalizeHeroArchitecture(hero: Record<string, unknown>) {
+  const architecture = readFirstCmsValue(hero, [
+    "architecture",
+    "architectureCard",
+    "architecture_card",
+    "systemArchitecture",
+  ]);
+
+  if (!isRecord(architecture)) {
+    return undefined;
+  }
+
+  const core = readFirstCmsValue(architecture, ["core", "api", "service"]);
+  const boundary = readFirstCmsValue(architecture, ["boundary", "boundaries"]);
+
+  return {
+    eyebrow: readFirstCmsString(architecture, ["eyebrow", "label", "kicker"]),
+    title: readFirstCmsString(architecture, ["title", "heading"]),
+    status: readFirstCmsString(architecture, ["status", "badge", "state"]),
+    clients: readFirstCmsArray(architecture, ["clients", "apps"]),
+    core: isRecord(core)
+      ? {
+          eyebrow: readFirstCmsString(core, ["eyebrow", "label", "kicker"]),
+          title: readFirstCmsString(core, ["title", "heading", "name"]),
+          version: readFirstCmsString(core, ["version", "badge"]),
+          services: normalizeLabelValueItems(
+            readFirstCmsValue(core, ["services", "items", "features"]),
+          ),
+        }
+      : undefined,
+    foundations: normalizeLabelValueItems(
+      readFirstCmsValue(architecture, ["foundations", "foundationItems"]),
+    ),
+    boundary: isRecord(boundary)
+      ? {
+          label: readFirstCmsString(boundary, ["label", "title"]),
+          value: readFirstCmsString(boundary, ["value", "text", "description"]),
+        }
+      : undefined,
+  };
+}
+
+function findHeroSection(cmsHome: CmsHomeResponse) {
+  const source = cmsHome as Record<string, unknown>;
+  const directHero = readFirstCmsValue(source, [
+    "hero",
+    "homeHero",
+    "home_hero",
+    "heroSection",
+    "hero_section",
+    "sections.hero",
+    "content.hero",
+    "page.hero",
+  ]);
+
+  if (isRecord(directHero)) {
+    return directHero;
+  }
+
+  const sections = readFirstCmsArray(source, ["sections", "contentSections"]);
+
+  if (sections) {
+    const heroSection = sections.find((section) => {
+      if (!isRecord(section)) {
+        return false;
+      }
+
+      const type = readFirstCmsString(section, ["type", "key", "name", "slug"]);
+
+      return type === "hero" || type === "home_hero" || type === "hero_section";
+    });
+
+    if (isRecord(heroSection)) {
+      return heroSection;
+    }
+  }
+
+  if (
+    readFirstCmsString(source, ["headline", "title", "heroTitle", "hero_title"])
+  ) {
+    return source;
+  }
+
+  return null;
+}
+
+function removeUndefinedFields<TValue>(value: TValue): TValue {
+  if (Array.isArray(value)) {
+    return value.map(removeUndefinedFields) as TValue;
+  }
+
+  if (!isRecord(value)) {
+    return value;
+  }
+
+  return Object.fromEntries(
+    Object.entries(value)
+      .filter(([, item]) => item !== undefined)
+      .map(([key, item]) => [key, removeUndefinedFields(item)]),
+  ) as TValue;
+}
+
+function normalizeCmsHero(cmsHome: CmsHomeResponse) {
+  const hero = findHeroSection(cmsHome);
+
+  if (!hero) {
+    return undefined;
+  }
+
+  const badge = readFirstCmsValue(hero, ["badge", "eyebrow", "kicker"]);
+  const normalizedHero = {
+    badge: isRecord(badge)
+      ? {
+          label: readFirstCmsString(badge, ["label", "title", "text", "value"]),
+          meta: readFirstCmsString(badge, ["meta", "subtitle", "description"]),
+        }
+      : {
+          label: readFirstCmsString(hero, [
+            "badgeLabel",
+            "badge_label",
+            "eyebrow",
+            "kicker",
+            "label",
+          ]),
+          meta: readFirstCmsString(hero, [
+            "badgeMeta",
+            "badge_meta",
+            "meta",
+            "overline",
+          ]),
+        },
+    headline: readFirstCmsString(hero, [
+      "headline",
+      "title",
+      "heading",
+      "heroTitle",
+      "hero_title",
+    ]),
+    description: readFirstCmsString(hero, [
+      "description",
+      "subtitle",
+      "summary",
+      "body",
+      "intro",
+      "heroDescription",
+      "hero_description",
+    ]),
+    ctas: normalizeHeroCtas(hero),
+    capabilities: normalizeLabelValueItems(
+      readFirstCmsValue(hero, ["capabilities", "features", "items"]),
+    ),
+    architecture: normalizeHeroArchitecture(hero),
+  };
+
+  return removeUndefinedFields(normalizedHero);
+}
+
 function readHomeSection(
   cmsHome: CmsHomeResponse,
   key: keyof HomePageData,
@@ -439,7 +738,7 @@ export function adaptCmsHome(
       logger,
     ),
     hero: mergeWithStaticShape(
-      readHomeSection(cmsHome, "hero"),
+      normalizeCmsHero(cmsHome),
       staticHomeData.hero,
       "hero",
       logger,
