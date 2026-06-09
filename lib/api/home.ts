@@ -8,7 +8,7 @@ export async function getCmsHome(
   locale: Locale,
   options: CmsRequestOptions = {},
 ) {
-  const response = await fetchApi<CmsHomeResponse>("/home", {
+  const response = await fetchApi<CmsHomeResponse>("/api/v1/home", {
     locale,
     ...options,
   });
