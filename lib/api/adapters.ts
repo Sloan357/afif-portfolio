@@ -1455,6 +1455,106 @@ function prepareCmsProjectPayload(
   mediaFallbackProject?: CmsProjectPayload | null,
 ): CmsProjectPayload {
   const preparedProject: Record<string, unknown> = { ...cmsProject };
+  const title = readFirstCmsString(preparedProject, [
+    "title",
+    "name",
+    "heading",
+  ]);
+  const subtitle = readFirstCmsString(preparedProject, [
+    "summary",
+    "subtitle",
+    "excerpt",
+    "shortDescription",
+    "projectSummary",
+    "intro",
+  ]);
+  const description = readFirstCmsString(preparedProject, [
+    "description",
+    "content",
+    "body",
+    "details",
+    "longDescription",
+    "caseStudySummary",
+    "summary",
+  ]);
+  const type = readFirstCmsString(preparedProject, [
+    "type",
+    "projectType",
+    "categoryLabel",
+  ]);
+  const role = readFirstCmsString(preparedProject, ["role", "myRole"]);
+  const categories = readFirstCmsArray(preparedProject, [
+    "categories",
+    "tags",
+    "filters",
+  ]);
+  const stack = readFirstCmsArray(preparedProject, [
+    "stack",
+    "technologies",
+    "techStack",
+  ]);
+  const architectureNotes = readFirstCmsArray(preparedProject, [
+    "architectureNotes",
+    "architecture",
+    "technicalNotes",
+  ]);
+  const challenges = readFirstCmsArray(preparedProject, [
+    "challenges",
+    "challengeItems",
+  ]);
+  const outcomes = readFirstCmsArray(preparedProject, [
+    "outcomes",
+    "outcomeItems",
+    "results",
+  ]);
+  const externalLinks = readFirstCmsArray(preparedProject, [
+    "externalLinks",
+    "links",
+  ]);
+
+  if (title) {
+    preparedProject.title = title;
+  }
+
+  if (subtitle) {
+    preparedProject.subtitle = subtitle;
+  }
+
+  if (description) {
+    preparedProject.description = description;
+  }
+
+  if (type) {
+    preparedProject.type = type;
+  }
+
+  if (role) {
+    preparedProject.role = role;
+  }
+
+  if (categories) {
+    preparedProject.categories = categories;
+  }
+
+  if (stack) {
+    preparedProject.stack = stack;
+  }
+
+  if (architectureNotes) {
+    preparedProject.architectureNotes = architectureNotes;
+  }
+
+  if (challenges) {
+    preparedProject.challenges = challenges;
+  }
+
+  if (outcomes) {
+    preparedProject.outcomes = outcomes;
+  }
+
+  if (externalLinks) {
+    preparedProject.externalLinks = externalLinks;
+  }
 
   if (!readCmsProjectMediaSource(preparedProject)) {
     const fallbackMedia = mediaFallbackProject
