@@ -981,30 +981,32 @@ function readFirstCmsField(source: Record<string, unknown>, keys: string[]) {
 }
 
 function formatExperiencePeriod(experience: Record<string, unknown>) {
-  const period = readFirstCmsField(experience, [
+  const period = readFirstCmsValue(experience, [
     "period",
     "periodDisplay",
     "dateDisplay",
     "dateRange",
+    "dates",
+    "duration",
   ]);
 
   if (typeof period === "string" && period.trim()) {
     return period;
   }
 
-  const startDate = readFirstCmsField(experience, [
+  const startDate = readFirstCmsValue(experience, [
     "startDate",
     "startedAt",
     "from",
     "startYear",
   ]);
-  const endDate = readFirstCmsField(experience, [
+  const endDate = readFirstCmsValue(experience, [
     "endDate",
     "endedAt",
     "to",
     "endYear",
   ]);
-  const isCurrent = readFirstCmsField(experience, ["isCurrent", "current"]);
+  const isCurrent = readFirstCmsValue(experience, ["isCurrent", "current"]);
 
   if (typeof startDate === "string" || typeof startDate === "number") {
     const endDisplay =
@@ -1051,51 +1053,67 @@ function prepareCmsExperienceItem(item: unknown) {
   }
 
   const preparedItem = { ...item };
-  const role = readFirstCmsField(preparedItem, ["role", "title", "position"]);
-  const technologies = readFirstCmsField(preparedItem, [
+  const role = readFirstCmsString(preparedItem, [
+    "role",
+    "title",
+    "position",
+    "jobTitle",
+  ]);
+  const company = readFirstCmsString(preparedItem, [
+    "company",
+    "organization",
+    "employer",
+    "client",
+  ]);
+  const location = readFirstCmsString(preparedItem, [
+    "location",
+    "locationName",
+    "city",
+    "region",
+  ]);
+  const technologies = readFirstCmsArray(preparedItem, [
     "technologies",
     "stack",
     "techStack",
   ]);
-  const responsibilities = readFirstCmsField(preparedItem, [
+  const responsibilities = readFirstCmsArray(preparedItem, [
     "responsibilities",
     "responsibilityItems",
     "highlights",
     "items",
+    "tasks",
   ]);
-  const summary = readFirstCmsField(preparedItem, [
+  const summary = readFirstCmsString(preparedItem, [
     "summary",
     "description",
+    "content",
     "intro",
+    "overview",
   ]);
+  const period = formatExperiencePeriod(preparedItem);
 
-  if (!readCmsField(preparedItem, "role").found && typeof role === "string") {
+  if (role) {
     preparedItem.role = role;
   }
 
-  if (
-    !readCmsField(preparedItem, "technologies").found &&
-    Array.isArray(technologies)
-  ) {
+  if (company || location) {
+    preparedItem.company = [company, location].filter(Boolean).join(" · ");
+  }
+
+  if (technologies) {
     preparedItem.technologies = technologies;
   }
 
-  if (
-    !readCmsField(preparedItem, "responsibilities").found &&
-    Array.isArray(responsibilities)
-  ) {
+  if (responsibilities) {
     preparedItem.responsibilities = responsibilities;
   }
 
-  if (
-    !readCmsField(preparedItem, "summary").found &&
-    typeof summary === "string"
-  ) {
+  if (summary) {
     preparedItem.summary = summary;
   }
 
-  if (!readCmsField(preparedItem, "period").found) {
-    preparedItem.period = formatExperiencePeriod(preparedItem);
+  if (period) {
+    preparedItem.period = period;
   }
 
   return preparedItem;
@@ -1103,7 +1121,48 @@ function prepareCmsExperienceItem(item: unknown) {
 
 function prepareCmsExperiencePayload(cmsExperience: CmsExperiencePayload) {
   const preparedExperience = { ...cmsExperience };
+  const eyebrow = readFirstCmsString(preparedExperience, [
+    "eyebrow",
+    "label",
+    "kicker",
+  ]);
+  const title = readFirstCmsString(preparedExperience, [
+    "title",
+    "heading",
+    "name",
+  ]);
+  const introduction = readFirstCmsString(preparedExperience, [
+    "introduction",
+    "intro",
+    "summary",
+    "description",
+    "content",
+    "overview",
+  ]);
+  const focusAreas = readFirstCmsArray(preparedExperience, [
+    "focusAreas",
+    "focus",
+    "specialties",
+    "skills",
+    "technologies",
+  ]);
   const experiences = readExperienceItems(preparedExperience);
+
+  if (eyebrow) {
+    preparedExperience.eyebrow = eyebrow;
+  }
+
+  if (title) {
+    preparedExperience.title = title;
+  }
+
+  if (introduction) {
+    preparedExperience.introduction = introduction;
+  }
+
+  if (focusAreas) {
+    preparedExperience.focusAreas = focusAreas;
+  }
 
   if (experiences) {
     preparedExperience.experiences = experiences.map(prepareCmsExperienceItem);
