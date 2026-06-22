@@ -1176,11 +1176,19 @@ function formatExperiencePeriod(
 }
 
 function readExperiencePayload(cmsExperience: CmsExperienceResponse | null) {
+  if (Array.isArray(cmsExperience)) {
+    return { experiences: cmsExperience } satisfies CmsExperiencePayload;
+  }
+
   if (!isRecord(cmsExperience)) {
     return null;
   }
 
   const experience = readCmsField(cmsExperience, "experience");
+
+  if (Array.isArray(experience.value)) {
+    return { experiences: experience.value } satisfies CmsExperiencePayload;
+  }
 
   if (isRecord(experience.value)) {
     return experience.value as CmsExperiencePayload;

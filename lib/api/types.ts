@@ -58,6 +58,7 @@ export type CmsExperiencePayload = Record<string, unknown>;
 
 export type CmsExperienceResponse =
   | CmsExperiencePayload
+  | CmsExperiencePayload[]
   | {
       experience?: CmsExperiencePayload;
     };
