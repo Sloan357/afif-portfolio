@@ -1222,42 +1222,185 @@ function readLabsArray(cmsLabs: CmsLabsResponse | null) {
   return null;
 }
 
+function prepareCmsLabsSectionPayload(
+  cmsLabs: CmsLabsResponse | null,
+): Partial<LabsDataShape> {
+  if (!isRecord(cmsLabs)) {
+    return {};
+  }
+
+  const preparedLabs: Partial<LabsDataShape> = {};
+  const eyebrow = readFirstCmsString(cmsLabs, ["eyebrow", "label", "kicker"]);
+  const title = readFirstCmsString(cmsLabs, ["title", "heading", "name"]);
+  const description = readFirstCmsString(cmsLabs, [
+    "description",
+    "summary",
+    "content",
+    "intro",
+  ]);
+
+  if (eyebrow) {
+    preparedLabs.eyebrow = eyebrow;
+  }
+
+  if (title) {
+    preparedLabs.title = title;
+  }
+
+  if (description) {
+    preparedLabs.description = description;
+  }
+
+  return preparedLabs;
+}
+
 function prepareCmsLabPayload(cmsLab: CmsLabPayload): CmsLabPayload {
   const preparedLab = { ...cmsLab };
-  const stack = readCmsField(preparedLab, "stack");
-  const technologies = readCmsField(preparedLab, "technologies");
+  const title = readFirstCmsString(preparedLab, ["title", "name", "heading"]);
+  const description = readFirstCmsString(preparedLab, [
+    "summary",
+    "description",
+    "content",
+    "excerpt",
+    "problem",
+    "approach",
+  ]);
+  const type = readFirstCmsString(preparedLab, [
+    "type",
+    "labType",
+    "categoryLabel",
+  ]);
+  const showcase = readFirstCmsString(preparedLab, [
+    "showcase",
+    "focus",
+    "highlight",
+    "skillsSummary",
+    "approach",
+  ]);
+  const stack = readFirstCmsArray(preparedLab, [
+    "stack",
+    "technologies",
+    "techStack",
+  ]);
+  const galleryImages = readFirstCmsArray(preparedLab, [
+    "galleryImages",
+    "gallery",
+    "images",
+  ]);
 
-  if (!stack.found && Array.isArray(technologies.value)) {
-    preparedLab.stack = technologies.value;
+  if (title) {
+    preparedLab.title = title;
+  }
+
+  if (description) {
+    preparedLab.description = description;
+  }
+
+  if (type) {
+    preparedLab.type = type;
+  }
+
+  if (showcase) {
+    preparedLab.showcase = showcase;
+  }
+
+  if (stack) {
+    preparedLab.stack = stack;
+  }
+
+  if (galleryImages) {
+    preparedLab.galleryImages = galleryImages;
   }
 
   const concept = readCmsField(preparedLab, "concept");
-  const architectureNotes = readCmsField(preparedLab, "architectureNotes");
+  const architectureNotes = readFirstCmsArray(preparedLab, [
+    "architectureNotes",
+    "architecture_notes",
+    "technicalNotes",
+  ]);
+  const skillsDemonstrated = readFirstCmsArray(preparedLab, [
+    "skillsDemonstrated",
+    "skills",
+    "technologies",
+    "stack",
+  ]);
+  const plannedArchitecture = readFirstCmsArray(preparedLab, [
+    "plannedArchitecture",
+    "architecturePlan",
+    "architecture",
+    "approachItems",
+  ]);
+  const whyItMatters = readFirstCmsString(preparedLab, [
+    "whyItMatters",
+    "impact",
+    "value",
+    "outcome",
+  ]);
+  const conceptSummary = readFirstCmsString(preparedLab, [
+    "conceptSummary",
+    "summary",
+    "content",
+    "problem",
+    "approach",
+    "description",
+  ]);
 
-  if (isRecord(concept.value)) {
-    const preparedConcept = { ...concept.value };
-    const skillsDemonstrated = readCmsField(
-      preparedConcept,
-      "skillsDemonstrated",
-    );
-    const conceptTechnologies = readCmsField(preparedConcept, "technologies");
+  const preparedConcept = isRecord(concept.value) ? { ...concept.value } : {};
+  const nestedConceptSummary = readFirstCmsString(preparedConcept, [
+    "summary",
+    "description",
+    "content",
+    "problem",
+    "approach",
+  ]);
+  const nestedSkillsDemonstrated = readFirstCmsArray(preparedConcept, [
+    "skillsDemonstrated",
+    "skills",
+    "technologies",
+  ]);
+  const nestedPlannedArchitecture = readFirstCmsArray(preparedConcept, [
+    "plannedArchitecture",
+    "architecturePlan",
+    "architecture",
+    "approachItems",
+  ]);
+  const nestedWhyItMatters = readFirstCmsString(preparedConcept, [
+    "whyItMatters",
+    "impact",
+    "value",
+    "outcome",
+  ]);
+  const nestedArchitectureNotes = readFirstCmsArray(preparedConcept, [
+    "architectureNotes",
+    "architecture_notes",
+    "technicalNotes",
+  ]);
 
-    if (!skillsDemonstrated.found && Array.isArray(conceptTechnologies.value)) {
-      preparedConcept.skillsDemonstrated = conceptTechnologies.value;
-    }
+  if (nestedConceptSummary || conceptSummary) {
+    preparedConcept.summary = nestedConceptSummary ?? conceptSummary;
+  }
 
-    if (
-      !readCmsField(preparedConcept, "architectureNotes").found &&
-      Array.isArray(architectureNotes.value)
-    ) {
-      preparedConcept.architectureNotes = architectureNotes.value;
-    }
+  if (nestedSkillsDemonstrated || skillsDemonstrated) {
+    preparedConcept.skillsDemonstrated =
+      nestedSkillsDemonstrated ?? skillsDemonstrated;
+  }
 
+  if (nestedPlannedArchitecture || plannedArchitecture) {
+    preparedConcept.plannedArchitecture =
+      nestedPlannedArchitecture ?? plannedArchitecture;
+  }
+
+  if (nestedWhyItMatters || whyItMatters) {
+    preparedConcept.whyItMatters = nestedWhyItMatters ?? whyItMatters;
+  }
+
+  if (nestedArchitectureNotes || architectureNotes) {
+    preparedConcept.architectureNotes =
+      nestedArchitectureNotes ?? architectureNotes;
+  }
+
+  if (Object.keys(preparedConcept).length > 0) {
     preparedLab.concept = preparedConcept;
-  } else if (Array.isArray(architectureNotes.value)) {
-    preparedLab.concept = {
-      architectureNotes: architectureNotes.value,
-    };
   }
 
   return preparedLab;
@@ -1330,12 +1473,17 @@ export function adaptCmsLabs(
   const staticLabsData = fallbackLabsData ?? getLabsData(locale);
   const logger = createFallbackLogger(locale, "Labs adapter");
   const labs = readLabsArray(cmsLabs);
+  const preparedLabsData = prepareCmsLabsSectionPayload(cmsLabs);
 
   if (!labs || labs.length === 0) {
     logger.add("labs.labs");
     logger.flush();
 
-    return staticLabsData;
+    return {
+      ...staticLabsData,
+      ...preparedLabsData,
+      labs: staticLabsData.labs,
+    };
   }
 
   const adaptedLabs = labs.map((lab, index) => {
@@ -1358,6 +1506,7 @@ export function adaptCmsLabs(
 
   return {
     ...staticLabsData,
+    ...preparedLabsData,
     labs: adaptedLabs,
   };
 }
