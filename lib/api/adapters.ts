@@ -853,6 +853,47 @@ function readHomeSection(
   return undefined;
 }
 
+function normalizeCmsTechnologyItems(value: unknown, locale: Locale) {
+  const items = unwrapCmsArray(value) ?? (Array.isArray(value) ? value : null);
+
+  if (!items) {
+    return [];
+  }
+
+  return items.flatMap((item) => {
+    if (typeof item === "string" && item.trim()) {
+      return [item];
+    }
+
+    if (!isRecord(item)) {
+      return [];
+    }
+
+    const label = readLocalizedCmsString(
+      item,
+      ["label", "name", "title", "value", "technology"],
+      locale,
+    );
+
+    return label ? [label] : [];
+  });
+}
+
+function readCmsHomeTechnologies(cmsHome: CmsHomeResponse, locale: Locale) {
+  const source = cmsHome as Record<string, unknown>;
+  const technologies = readLocalizedCmsValue(
+    source,
+    ["technologies", "technologyStack", "techStack", "skills"],
+    locale,
+  );
+  const normalizedTechnologies = normalizeCmsTechnologyItems(
+    technologies,
+    locale,
+  );
+
+  return normalizedTechnologies.length > 0 ? normalizedTechnologies : null;
+}
+
 export function getStaticHomeData(locale: Locale): HomePageData {
   return {
     navigation: getNavigationData(locale),
@@ -876,6 +917,7 @@ export function adaptCmsHome(
   }
 
   const logger = createFallbackLogger(locale);
+  const cmsTechnologies = readCmsHomeTechnologies(cmsHome, locale);
   const adaptedHomeData: HomePageData = {
     navigation: mergeWithStaticShape(
       readHomeSection(cmsHome, "navigation"),
@@ -924,6 +966,13 @@ export function adaptCmsHome(
       logger,
     ),
   };
+
+  if (cmsTechnologies) {
+    adaptedHomeData.experience = {
+      ...adaptedHomeData.experience,
+      focusAreas: cmsTechnologies,
+    };
+  }
 
   logger.flush();
 
