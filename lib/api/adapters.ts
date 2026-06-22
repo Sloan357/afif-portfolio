@@ -24,7 +24,7 @@ import type {
   CmsProjectsResponse,
   HomePageData,
 } from "@/lib/api/types";
-import type { Locale } from "@/i18n/routing";
+import { defaultLocale, type Locale } from "@/i18n/routing";
 
 type FallbackLogger = {
   add: (path: string) => void;
@@ -424,6 +424,152 @@ function readFirstCmsString(source: Record<string, unknown>, keys: string[]) {
 
 function readFirstCmsArray(source: Record<string, unknown>, keys: string[]) {
   const value = readFirstCmsValue(source, keys);
+
+  return Array.isArray(value) ? value : undefined;
+}
+
+function getCmsTranslationEntry(
+  source: Record<string, unknown>,
+  locale: Locale,
+) {
+  const translations = readCmsField(source, "translations").value;
+
+  if (Array.isArray(translations)) {
+    const entry = translations.find((translation) => {
+      if (!isRecord(translation)) {
+        return false;
+      }
+
+      const entryLocale = readFirstCmsString(translation, [
+        "locale",
+        "language",
+        "lang",
+      ]);
+
+      return entryLocale === locale;
+    });
+
+    if (!isRecord(entry)) {
+      return undefined;
+    }
+
+    const fields = readCmsField(entry, "fields").value;
+    const content = readCmsField(entry, "content").value;
+
+    if (isRecord(fields)) {
+      return fields;
+    }
+
+    if (isRecord(content)) {
+      return content;
+    }
+
+    return entry;
+  }
+
+  if (isRecord(translations)) {
+    const entry = readCmsField(translations, locale).value;
+
+    if (isRecord(entry)) {
+      const fields = readCmsField(entry, "fields").value;
+      const content = readCmsField(entry, "content").value;
+
+      if (isRecord(fields)) {
+        return fields;
+      }
+
+      if (isRecord(content)) {
+        return content;
+      }
+
+      return entry;
+    }
+  }
+
+  return undefined;
+}
+
+function readLocaleKeyedCmsValue(
+  source: Record<string, unknown>,
+  keys: string[],
+  locale: Locale,
+) {
+  for (const key of keys) {
+    const value = key.includes(".")
+      ? readNestedCmsField(source, key)
+      : readCmsField(source, key).value;
+
+    if (isRecord(value)) {
+      const localizedValue = readCmsField(value, locale).value;
+      const fallbackValue = readCmsField(value, defaultLocale).value;
+
+      if (localizedValue !== undefined && localizedValue !== null) {
+        return localizedValue;
+      }
+
+      if (fallbackValue !== undefined && fallbackValue !== null) {
+        return fallbackValue;
+      }
+    }
+  }
+
+  return undefined;
+}
+
+function readLocalizedCmsValue(
+  source: Record<string, unknown>,
+  keys: string[],
+  locale: Locale,
+) {
+  const localizedTranslation = getCmsTranslationEntry(source, locale);
+  const fallbackTranslation =
+    locale === defaultLocale
+      ? undefined
+      : getCmsTranslationEntry(source, defaultLocale);
+
+  if (localizedTranslation) {
+    const value = readFirstCmsValue(localizedTranslation, keys);
+
+    if (value !== undefined && value !== null) {
+      return value;
+    }
+  }
+
+  const localeKeyedValue = readLocaleKeyedCmsValue(source, keys, locale);
+
+  if (localeKeyedValue !== undefined && localeKeyedValue !== null) {
+    return localeKeyedValue;
+  }
+
+  const directValue = readFirstCmsValue(source, keys);
+
+  if (directValue !== undefined && directValue !== null) {
+    return directValue;
+  }
+
+  if (fallbackTranslation) {
+    return readFirstCmsValue(fallbackTranslation, keys);
+  }
+
+  return undefined;
+}
+
+function readLocalizedCmsString(
+  source: Record<string, unknown>,
+  keys: string[],
+  locale: Locale,
+) {
+  const value = readLocalizedCmsValue(source, keys, locale);
+
+  return typeof value === "string" && value.trim() ? value : undefined;
+}
+
+function readLocalizedCmsArray(
+  source: Record<string, unknown>,
+  keys: string[],
+  locale: Locale,
+) {
+  const value = readLocalizedCmsValue(source, keys, locale);
 
   return Array.isArray(value) ? value : undefined;
 }
@@ -980,15 +1126,22 @@ function readFirstCmsField(source: Record<string, unknown>, keys: string[]) {
   return undefined;
 }
 
-function formatExperiencePeriod(experience: Record<string, unknown>) {
-  const period = readFirstCmsValue(experience, [
-    "period",
-    "periodDisplay",
-    "dateDisplay",
-    "dateRange",
-    "dates",
-    "duration",
-  ]);
+function formatExperiencePeriod(
+  experience: Record<string, unknown>,
+  locale: Locale,
+) {
+  const period = readLocalizedCmsValue(
+    experience,
+    [
+      "period",
+      "periodDisplay",
+      "dateDisplay",
+      "dateRange",
+      "dates",
+      "duration",
+    ],
+    locale,
+  );
 
   if (typeof period === "string" && period.trim()) {
     return period;
@@ -1036,61 +1189,89 @@ function readExperiencePayload(cmsExperience: CmsExperienceResponse | null) {
   return cmsExperience as CmsExperiencePayload;
 }
 
-function readExperienceItems(cmsExperience: Record<string, unknown>) {
-  const experiences = readFirstCmsField(cmsExperience, [
-    "experiences",
-    "items",
-    "timeline",
-    "roles",
-  ]);
+function unwrapCmsArray(value: unknown) {
+  if (Array.isArray(value)) {
+    return value;
+  }
 
-  return Array.isArray(experiences) ? experiences : null;
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const data = readCmsField(value, "data").value;
+  const items = readCmsField(value, "items").value;
+  const records = readCmsField(value, "records").value;
+
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (Array.isArray(items)) {
+    return items;
+  }
+
+  if (Array.isArray(records)) {
+    return records;
+  }
+
+  return null;
 }
 
-function prepareCmsExperienceItem(item: unknown) {
+function readExperienceItems(cmsExperience: Record<string, unknown>) {
+  const experiences = readFirstCmsValue(cmsExperience, [
+    "experiences",
+    "experienceItems",
+    "experience_items",
+    "workExperience",
+    "work_experience",
+    "items",
+    "entries",
+    "records",
+    "timeline",
+    "roles",
+    "data",
+  ]);
+
+  return unwrapCmsArray(experiences);
+}
+
+function prepareCmsExperienceItem(item: unknown, locale: Locale) {
   if (!isRecord(item)) {
     return item;
   }
 
   const preparedItem = { ...item };
-  const role = readFirstCmsString(preparedItem, [
-    "role",
-    "title",
-    "position",
-    "jobTitle",
-  ]);
-  const company = readFirstCmsString(preparedItem, [
-    "company",
-    "organization",
-    "employer",
-    "client",
-  ]);
-  const location = readFirstCmsString(preparedItem, [
-    "location",
-    "locationName",
-    "city",
-    "region",
-  ]);
-  const technologies = readFirstCmsArray(preparedItem, [
-    "technologies",
-    "stack",
-    "techStack",
-  ]);
-  const responsibilities = readFirstCmsArray(preparedItem, [
-    "responsibilities",
-    "responsibilityItems",
-    "highlights",
-    "items",
-    "tasks",
-  ]);
-  const summary = readFirstCmsString(preparedItem, [
-    "summary",
-    "description",
-    "content",
-    "intro",
-    "overview",
-  ]);
-  const period = formatExperiencePeriod(preparedItem);
+  const role = readLocalizedCmsString(
+    preparedItem,
+    ["role", "title", "position", "jobTitle"],
+    locale,
+  );
+  const company = readLocalizedCmsString(
+    preparedItem,
+    ["company", "organization", "employer", "client"],
+    locale,
+  );
+  const location = readLocalizedCmsString(
+    preparedItem,
+    ["location", "locationName", "city", "region"],
+    locale,
+  );
+  const technologies = readLocalizedCmsArray(
+    preparedItem,
+    ["technologies", "stack", "techStack"],
+    locale,
+  );
+  const responsibilities = readLocalizedCmsArray(
+    preparedItem,
+    ["responsibilities", "responsibilityItems", "highlights", "items", "tasks"],
+    locale,
+  );
+  const summary = readLocalizedCmsString(
+    preparedItem,
+    ["summary", "description", "content", "intro", "overview"],
+    locale,
+  );
+  const period = formatExperiencePeriod(preparedItem, locale);
 
   if (role) {
     preparedItem.role = role;
@@ -1119,33 +1300,31 @@ function prepareCmsExperienceItem(item: unknown) {
   return preparedItem;
 }
 
-function prepareCmsExperiencePayload(cmsExperience: CmsExperiencePayload) {
+function prepareCmsExperiencePayload(
+  cmsExperience: CmsExperiencePayload,
+  locale: Locale,
+) {
   const preparedExperience = { ...cmsExperience };
-  const eyebrow = readFirstCmsString(preparedExperience, [
-    "eyebrow",
-    "label",
-    "kicker",
-  ]);
-  const title = readFirstCmsString(preparedExperience, [
-    "title",
-    "heading",
-    "name",
-  ]);
-  const introduction = readFirstCmsString(preparedExperience, [
-    "introduction",
-    "intro",
-    "summary",
-    "description",
-    "content",
-    "overview",
-  ]);
-  const focusAreas = readFirstCmsArray(preparedExperience, [
-    "focusAreas",
-    "focus",
-    "specialties",
-    "skills",
-    "technologies",
-  ]);
+  const eyebrow = readLocalizedCmsString(
+    preparedExperience,
+    ["eyebrow", "label", "kicker"],
+    locale,
+  );
+  const title = readLocalizedCmsString(
+    preparedExperience,
+    ["title", "heading", "name"],
+    locale,
+  );
+  const introduction = readLocalizedCmsString(
+    preparedExperience,
+    ["introduction", "intro", "summary", "description", "content", "overview"],
+    locale,
+  );
+  const focusAreas = readLocalizedCmsArray(
+    preparedExperience,
+    ["focusAreas", "focus", "specialties", "skills", "technologies"],
+    locale,
+  );
   const experiences = readExperienceItems(preparedExperience);
 
   if (eyebrow) {
@@ -1165,7 +1344,9 @@ function prepareCmsExperiencePayload(cmsExperience: CmsExperiencePayload) {
   }
 
   if (experiences) {
-    preparedExperience.experiences = experiences.map(prepareCmsExperienceItem);
+    preparedExperience.experiences = experiences.map((item) =>
+      prepareCmsExperienceItem(item, locale),
+    );
   }
 
   return preparedExperience;
@@ -1226,7 +1407,7 @@ export function adaptCmsExperience(
     return staticExperienceData;
   }
 
-  const preparedExperience = prepareCmsExperiencePayload(experience);
+  const preparedExperience = prepareCmsExperiencePayload(experience, locale);
   const adaptedExperience = mergeWithStaticShape(
     preparedExperience,
     staticExperienceData,
