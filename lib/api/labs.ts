@@ -11,6 +11,7 @@ export async function getCmsLabs(
   const response = await fetchApi<CmsLabsResponse>("/api/v1/labs", {
     locale,
     ...options,
+    tags: ["labs"],
   });
 
   return response?.data ?? null;

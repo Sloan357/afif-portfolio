@@ -54,6 +54,7 @@ export async function fetchApi<TData>(
       },
       next: {
         revalidate: options.revalidate ?? cmsApiCacheConfig.revalidate,
+        ...(options.tags ? { tags: options.tags } : {}),
       },
     });
 

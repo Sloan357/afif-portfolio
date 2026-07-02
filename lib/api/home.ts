@@ -4,6 +4,16 @@ import type { Locale } from "@/i18n/routing";
 
 type CmsRequestOptions = Pick<ApiFetchOptions, "revalidate">;
 
+const cmsHomeTags = [
+  "home",
+  "hero",
+  "settings",
+  "technologies",
+  "projects",
+  "labs",
+  "experience",
+];
+
 export async function getCmsHome(
   locale: Locale,
   options: CmsRequestOptions = {},
@@ -11,6 +21,7 @@ export async function getCmsHome(
   const response = await fetchApi<CmsHomeResponse>("/api/v1/home", {
     locale,
     ...options,
+    tags: cmsHomeTags,
   });
 
   return response?.data ?? null;

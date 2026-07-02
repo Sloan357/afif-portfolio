@@ -25,6 +25,7 @@ export type ApiEnvelope<TData> = {
 export type ApiFetchOptions = {
   locale?: Locale;
   revalidate?: number;
+  tags?: string[];
   searchParams?: Record<string, boolean | number | string | undefined>;
 };
 

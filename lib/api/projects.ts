@@ -15,6 +15,7 @@ export async function getCmsProjects(
   const response = await fetchApi<CmsProjectsResponse>("/api/v1/projects", {
     locale,
     ...options,
+    tags: ["projects"],
   });
 
   return response?.data ?? null;
@@ -30,6 +31,7 @@ export async function getCmsProject(
     {
       locale,
       ...options,
+      tags: ["projects", `project:${slug}`],
     },
   );
 

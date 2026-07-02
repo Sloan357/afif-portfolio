@@ -11,6 +11,7 @@ export async function getCmsExperience(
   const response = await fetchApi<CmsExperienceResponse>("/api/v1/experience", {
     locale,
     ...options,
+    tags: ["experience", "technologies"],
   });
 
   return response?.data ?? null;
