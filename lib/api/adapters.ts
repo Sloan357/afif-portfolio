@@ -612,6 +612,36 @@ function normalizeLabelValueItems(value: unknown) {
   return items.length > 0 ? items : undefined;
 }
 
+function normalizeStringItems(value: unknown) {
+  const items = unwrapCmsArray(value) ?? (Array.isArray(value) ? value : null);
+
+  if (!items) {
+    return undefined;
+  }
+
+  const normalizedItems = items.flatMap((item) => {
+    if (typeof item === "string" && item.trim()) {
+      return [item];
+    }
+
+    if (!isRecord(item)) {
+      return [];
+    }
+
+    const label = readFirstCmsString(item, [
+      "label",
+      "title",
+      "name",
+      "value",
+      "text",
+    ]);
+
+    return label ? [label] : [];
+  });
+
+  return normalizedItems.length > 0 ? normalizedItems : undefined;
+}
+
 function normalizeHeroCta(
   item: unknown,
   fallbackVariant: "primary" | "secondary",
@@ -684,39 +714,98 @@ function normalizeHeroArchitecture(hero: Record<string, unknown>) {
     "architectureCard",
     "architecture_card",
     "systemArchitecture",
+    "system_architecture",
   ]);
 
   if (!isRecord(architecture)) {
     return undefined;
   }
 
-  const core = readFirstCmsValue(architecture, ["core", "api", "service"]);
+  const core = readFirstCmsValue(architecture, [
+    "core",
+    "api",
+    "service",
+    "backend",
+  ]);
   const boundary = readFirstCmsValue(architecture, ["boundary", "boundaries"]);
+  const coreSource = isRecord(core) ? core : architecture;
+  const boundaryLabel = isRecord(boundary)
+    ? readFirstCmsString(boundary, ["label", "title", "name"])
+    : readFirstCmsString(architecture, ["boundaryLabel", "boundary_label"]);
+  const boundaryValue = isRecord(boundary)
+    ? readFirstCmsString(boundary, ["value", "text", "description"])
+    : typeof boundary === "string"
+      ? boundary
+      : readFirstCmsString(architecture, [
+          "boundaryValue",
+          "boundary_value",
+          "boundaries",
+        ]);
 
   return {
     eyebrow: readFirstCmsString(architecture, ["eyebrow", "label", "kicker"]),
-    title: readFirstCmsString(architecture, ["title", "heading"]),
+    title: readFirstCmsString(architecture, ["title", "heading", "name"]),
     status: readFirstCmsString(architecture, ["status", "badge", "state"]),
-    clients: readFirstCmsArray(architecture, ["clients", "apps"]),
-    core: isRecord(core)
-      ? {
-          eyebrow: readFirstCmsString(core, ["eyebrow", "label", "kicker"]),
-          title: readFirstCmsString(core, ["title", "heading", "name"]),
-          version: readFirstCmsString(core, ["version", "badge"]),
-          services: normalizeLabelValueItems(
-            readFirstCmsValue(core, ["services", "items", "features"]),
-          ),
-        }
-      : undefined,
-    foundations: normalizeLabelValueItems(
-      readFirstCmsValue(architecture, ["foundations", "foundationItems"]),
+    clients: normalizeStringItems(
+      readFirstCmsValue(architecture, [
+        "clients",
+        "apps",
+        "frontends",
+        "entrypoints",
+      ]),
     ),
-    boundary: isRecord(boundary)
-      ? {
-          label: readFirstCmsString(boundary, ["label", "title"]),
-          value: readFirstCmsString(boundary, ["value", "text", "description"]),
-        }
-      : undefined,
+    core: {
+      eyebrow: readFirstCmsString(coreSource, [
+        "eyebrow",
+        "label",
+        "kicker",
+        "coreEyebrow",
+        "core_eyebrow",
+      ]),
+      title: readFirstCmsString(coreSource, [
+        "title",
+        "heading",
+        "name",
+        "coreTitle",
+        "core_title",
+        "apiTitle",
+        "api_title",
+      ]),
+      version: readFirstCmsString(coreSource, [
+        "version",
+        "badge",
+        "coreVersion",
+        "core_version",
+        "apiVersion",
+        "api_version",
+      ]),
+      services: normalizeLabelValueItems(
+        readFirstCmsValue(coreSource, [
+          "services",
+          "items",
+          "features",
+          "coreServices",
+          "core_services",
+        ]),
+      ),
+    },
+    foundations: normalizeLabelValueItems(
+      readFirstCmsValue(architecture, [
+        "foundations",
+        "foundationItems",
+        "foundation_items",
+        "infrastructure",
+        "dataStores",
+        "data_stores",
+      ]),
+    ),
+    boundary:
+      boundaryLabel || boundaryValue
+        ? {
+            label: boundaryLabel,
+            value: boundaryValue,
+          }
+        : undefined,
   };
 }
 

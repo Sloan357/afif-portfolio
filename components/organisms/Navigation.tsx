@@ -84,7 +84,7 @@ export function Navigation({ locale, navigationData }: NavigationProps) {
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 lg:px-8">
       <nav
-        className={`mx-auto max-w-7xl border px-4 py-3 transition md:rounded-full md:px-5 ${
+        className={`mx-auto max-w-7xl border px-4 py-3 transition md:rounded-full md:px-5 xl:max-w-[88rem] ${
           isMenuOpen ? "rounded-3xl" : "rounded-full"
         } ${
           isScrolled || isMenuOpen

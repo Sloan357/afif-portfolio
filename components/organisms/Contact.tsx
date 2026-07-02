@@ -10,11 +10,12 @@ type ContactProps = {
 
 export function Contact({ locale, contactData }: ContactProps) {
   const resolvedContactData = contactData ?? getContactData(locale);
+  const currentYear = new Date().getFullYear();
 
   return (
     <section
       id="contact"
-      className="relative mx-auto max-w-7xl scroll-mt-24 overflow-hidden px-6 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24"
+      className="relative mx-auto max-w-7xl scroll-mt-24 overflow-hidden px-6 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24 xl:max-w-[88rem]"
     >
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_45%,rgba(14,165,233,0.06),transparent_42%)]" />
       <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent lg:inset-x-12" />
@@ -36,6 +37,10 @@ export function Contact({ locale, contactData }: ContactProps) {
           interactionLabels={resolvedContactData.interactionLabels}
         />
       </div>
+
+      <p className="mt-8 text-center text-xs text-neutral-600">
+        © {currentYear} Afif El Charif. All rights reserved.
+      </p>
     </section>
   );
 }
