@@ -72,6 +72,40 @@ export function Navigation({ locale, navigationData }: NavigationProps) {
   }, [locale, resolvedNavigationData.links, pathname]);
 
   useEffect(() => {
+    if (pathname !== `/${locale}`) {
+      return;
+    }
+
+    const scrollToCurrentHash = () => {
+      const hash = window.location.hash;
+
+      if (!hash) {
+        return;
+      }
+
+      const target = document.getElementById(hash.slice(1));
+      target?.scrollIntoView({ block: "start" });
+    };
+
+    let secondFrame: number | null = null;
+    const firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(scrollToCurrentHash);
+    });
+
+    window.addEventListener("hashchange", scrollToCurrentHash);
+
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+
+      if (secondFrame !== null) {
+        window.cancelAnimationFrame(secondFrame);
+      }
+
+      window.removeEventListener("hashchange", scrollToCurrentHash);
+    };
+  }, [locale, pathname]);
+
+  useEffect(() => {
     const updateScrollState = () => {
       setIsScrolled(window.scrollY > 16);
     };

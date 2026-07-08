@@ -10,6 +10,14 @@ type NavLinksProps = {
   onNavigate?: () => void;
 };
 
+function resolveNavHref(href: string, locale: Locale, isHomepage: boolean) {
+  if (href.startsWith("#")) {
+    return isHomepage ? href : localizedPath(locale, href);
+  }
+
+  return localizedPath(locale, href);
+}
+
 export function NavLinks({
   links,
   locale,
@@ -20,10 +28,7 @@ export function NavLinks({
   return (
     <>
       {links.map((link) => {
-        const href =
-          isHomepage && link.href.startsWith("#")
-            ? link.href
-            : localizedPath(locale, link.href);
+        const href = resolveNavHref(link.href, locale, isHomepage);
 
         return (
           <NavLink
