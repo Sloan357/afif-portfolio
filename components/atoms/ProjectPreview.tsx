@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 type PreviewImage = {
   src: string | null;
   alt: string;
@@ -18,12 +20,15 @@ export function ProjectPreview({ image, label }: ProjectPreviewProps) {
   return (
     <div className="mb-6 overflow-hidden rounded-xl border border-white/10 bg-black/20">
       {image && imageSrc ? (
-        <div
-          role="img"
-          aria-label={image.alt}
-          className="aspect-[16/10] bg-cover bg-center"
-          style={{ backgroundImage: `url(${imageSrc})` }}
-        />
+        <div className="relative aspect-[16/10] overflow-hidden">
+          <Image
+            src={imageSrc}
+            alt={image.alt}
+            fill
+            sizes="(max-width: 768px) calc(100vw - 3rem), (max-width: 1280px) 50vw, 430px"
+            className="object-cover object-center"
+          />
+        </div>
       ) : (
         <div className="relative aspect-[16/10] overflow-hidden bg-[#07080b]">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(14,165,233,0.12),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.045),transparent_45%)]" />
