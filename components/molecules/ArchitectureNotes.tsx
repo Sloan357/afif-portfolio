@@ -26,7 +26,8 @@ export function ArchitectureNotes({
               <span className="flex items-center justify-between gap-4">
                 {section.title}
                 <span className="text-xs font-medium text-neutral-500 group-open:text-cyan-200/70">
-                  {section.isDefaultOpen ? "Open" : "View"}
+                  <span className="group-open:hidden">View details</span>
+                  <span className="hidden group-open:inline">Hide details</span>
                 </span>
               </span>
             </summary>

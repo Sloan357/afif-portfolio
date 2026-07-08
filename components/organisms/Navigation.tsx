@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { MenuToggle } from "@/components/atoms/MenuToggle";
 import { NavLinks } from "@/components/molecules/NavLinks";
@@ -23,6 +23,7 @@ export function Navigation({ locale, navigationData }: NavigationProps) {
   const activeNavHref = pathname === `/${locale}` ? activeHref : null;
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const homepagePath = `/${locale}`;
@@ -81,9 +82,38 @@ export function Navigation({ locale, navigationData }: NavigationProps) {
     return () => window.removeEventListener("scroll", updateScrollState);
   }, []);
 
+  useEffect(() => {
+    if (!isMenuOpen) {
+      return;
+    }
+
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      const target = event.target;
+
+      if (target instanceof Node && !navRef.current?.contains(target)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    document.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsidePointer);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [isMenuOpen]);
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 lg:px-8">
       <nav
+        ref={navRef}
         className={`mx-auto max-w-7xl border px-4 py-3 transition md:rounded-full md:px-5 xl:max-w-[88rem] ${
           isMenuOpen ? "rounded-3xl" : "rounded-full"
         } ${
@@ -111,6 +141,7 @@ export function Navigation({ locale, navigationData }: NavigationProps) {
               links={resolvedNavigationData.links}
               locale={locale}
               activeHref={activeNavHref}
+              isHomepage={pathname === `/${locale}`}
             />
             <LanguageSwitcher locale={locale} />
           </div>
@@ -128,6 +159,7 @@ export function Navigation({ locale, navigationData }: NavigationProps) {
                 links={resolvedNavigationData.links}
                 locale={locale}
                 activeHref={activeNavHref}
+                isHomepage={pathname === `/${locale}`}
                 onNavigate={() => setIsMenuOpen(false)}
               />
               <LanguageSwitcher
