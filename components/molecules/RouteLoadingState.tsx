@@ -5,6 +5,7 @@ type RouteLoadingStateProps = {
 function LoadingBar({ className = "" }: { className?: string }) {
   return (
     <div
+      aria-hidden="true"
       className={`rounded-full bg-white/[0.07] shadow-inner shadow-white/[0.02] motion-safe:animate-pulse motion-reduce:animate-none ${className}`}
     />
   );
@@ -137,7 +138,7 @@ export function RouteLoadingState({
   const isProject = variant === "project";
 
   return (
-    <main className="min-h-screen bg-[#050608] text-white">
+    <main id="main-content" className="min-h-screen bg-[#050608] text-white">
       <section className="relative isolate mx-auto flex min-h-screen max-w-7xl flex-col justify-center overflow-hidden px-6 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24">
         <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_18%_22%,rgba(34,197,94,0.1),transparent_28%),radial-gradient(circle_at_78%_30%,rgba(14,165,233,0.1),transparent_26%),linear-gradient(180deg,#050608_0%,#09090b_48%,#050608_100%)]" />
         <div className="absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
@@ -149,9 +150,11 @@ export function RouteLoadingState({
               ? "grid gap-10 xl:grid-cols-[minmax(0,1fr)_420px] xl:gap-16"
               : "grid items-center gap-10 md:gap-12 xl:grid-cols-[minmax(0,1fr)_430px] xl:gap-16"
           }
+          role="status"
+          aria-live="polite"
           aria-busy="true"
-          aria-label="Loading content"
         >
+          <span className="sr-only">Loading content</span>
           <div>
             <LoadingBar className="h-7 w-44" />
             <LoadingBar className="mt-8 h-12 w-full max-w-3xl sm:h-16" />

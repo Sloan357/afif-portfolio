@@ -13,6 +13,7 @@ type LabCardProps = {
 
 export function LabCard({ lab }: LabCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const conceptPanelId = `lab-concept-${lab.slug}`;
 
   return (
     <article className="motion-card-reveal group relative overflow-hidden rounded-2xl border border-white/10 bg-[#08090d]/80 p-6 shadow-2xl shadow-black/30 backdrop-blur transition hover:border-white/20 hover:bg-[#0b0d12]/90">
@@ -37,14 +38,19 @@ export function LabCard({ lab }: LabCardProps) {
           </p>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-2">
+        <ul className="mt-6 flex flex-wrap gap-2">
           {lab.stack.map((technology) => (
-            <TechTag key={technology} label={technology} />
+            <li key={technology}>
+              <TechTag label={technology} />
+            </li>
           ))}
-        </div>
+        </ul>
 
         {isExpanded ? (
-          <div className="mt-6 space-y-5 rounded-xl border border-white/10 bg-white/[0.025] p-4">
+          <div
+            id={conceptPanelId}
+            className="mt-6 space-y-5 rounded-xl border border-white/10 bg-white/[0.025] p-4"
+          >
             <div>
               <p className="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase">
                 Concept
@@ -58,11 +64,13 @@ export function LabCard({ lab }: LabCardProps) {
               <p className="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase">
                 Skills demonstrated
               </p>
-              <div className="mt-3 flex flex-wrap gap-2">
+              <ul className="mt-3 flex flex-wrap gap-2">
                 {lab.concept.skillsDemonstrated.map((skill) => (
-                  <TechTag key={skill} label={skill} />
+                  <li key={skill}>
+                    <TechTag label={skill} />
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
 
             <div>
@@ -98,8 +106,9 @@ export function LabCard({ lab }: LabCardProps) {
           <button
             type="button"
             onClick={() => setIsExpanded((current) => !current)}
-            className="inline-flex text-sm font-semibold text-white underline-offset-4 transition hover:text-cyan-200 hover:underline"
+            className="inline-flex text-sm font-semibold text-white underline-offset-4 transition hover:text-cyan-200 hover:underline focus-visible:ring-2 focus-visible:ring-cyan-200/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050608] focus-visible:outline-none"
             aria-expanded={isExpanded}
+            aria-controls={conceptPanelId}
           >
             {isExpanded ? "Hide concept" : "View concept"}
           </button>

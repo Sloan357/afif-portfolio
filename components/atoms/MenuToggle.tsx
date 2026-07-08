@@ -1,16 +1,18 @@
 type MenuToggleProps = {
   isOpen: boolean;
   onClick: () => void;
+  controlsId: string;
 };
 
-export function MenuToggle({ isOpen, onClick }: MenuToggleProps) {
+export function MenuToggle({ isOpen, onClick, controlsId }: MenuToggleProps) {
   return (
     <button
       type="button"
       aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
       aria-expanded={isOpen}
+      aria-controls={controlsId}
       onClick={onClick}
-      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.035] text-white transition hover:border-white/20 hover:bg-white/[0.06] md:hidden"
+      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.035] text-white transition hover:border-white/20 hover:bg-white/[0.06] focus-visible:ring-2 focus-visible:ring-cyan-200/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050608] focus-visible:outline-none md:hidden"
     >
       <span className="relative h-3.5 w-4">
         <span

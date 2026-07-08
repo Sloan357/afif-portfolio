@@ -63,6 +63,9 @@ export function ContactActions({
               className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-neutral-950 shadow-[0_0_60px_rgba(255,255,255,0.16)] transition hover:bg-neutral-200 focus:ring-2 focus:ring-white/30 focus:ring-offset-2 focus:ring-offset-[#08090d] focus:outline-none"
             >
               {primaryAction.label}
+              {primaryAction.opensInNewTab ? (
+                <span className="sr-only"> Opens in a new tab</span>
+              ) : null}
             </a>
 
             {emailAddress ? (
@@ -86,6 +89,9 @@ export function ContactActions({
             className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/[0.035] px-7 py-3.5 text-sm font-semibold text-white backdrop-blur transition hover:border-white/25 hover:bg-white/[0.07] focus:ring-2 focus:ring-cyan-200/25 focus:ring-offset-2 focus:ring-offset-[#08090d] focus:outline-none"
           >
             {link.label}
+            {link.opensInNewTab ? (
+              <span className="sr-only"> Opens in a new tab</span>
+            ) : null}
           </a>
         ))}
       </div>

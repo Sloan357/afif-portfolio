@@ -76,17 +76,23 @@ export default async function Home({ params }: HomePageProps) {
   }
 
   return (
-    <main lang={locale} className="min-h-screen bg-[#050608] text-white">
+    <>
       <StructuredData data={createHomepageJsonLd(locale, homeData.seo)} />
       <Navigation locale={locale} navigationData={homeData.navigation} />
-      <Hero locale={locale} heroData={homeData.hero} />
-      <FeaturedProjects
-        locale={locale}
-        featuredProjectsData={featuredProjectsData}
-      />
-      <Labs locale={locale} labsData={labsData} />
-      <Experience locale={locale} experienceData={experienceData} />
-      <Contact locale={locale} contactData={homeData.contact} />
-    </main>
+      <main
+        id="main-content"
+        lang={locale}
+        className="min-h-screen bg-[#050608] text-white"
+      >
+        <Hero locale={locale} heroData={homeData.hero} />
+        <FeaturedProjects
+          locale={locale}
+          featuredProjectsData={featuredProjectsData}
+        />
+        <Labs locale={locale} labsData={labsData} />
+        <Experience locale={locale} experienceData={experienceData} />
+        <Contact locale={locale} contactData={homeData.contact} />
+      </main>
+    </>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SkipLink } from "@/components/atoms/SkipLink";
 import { createMetadataFromSeo, getSeoData } from "@/data/seo";
 import { isSupportedLocale, supportedLocales } from "@/i18n/routing";
 import "../globals.css";
@@ -51,7 +52,10 @@ export default async function LocaleLayout({
       lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <SkipLink />
+        {children}
+      </body>
     </html>
   );
 }

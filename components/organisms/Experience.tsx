@@ -30,21 +30,22 @@ export function Experience({ locale, experienceData }: ExperienceProps) {
             {resolvedExperienceData.introduction}
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-2">
+          <ul className="mt-8 flex flex-wrap gap-2">
             {resolvedExperienceData.focusAreas.map((focusArea) => (
-              <TechTag key={focusArea} label={focusArea} />
+              <li key={focusArea}>
+                <TechTag label={focusArea} />
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
 
-        <div className="relative space-y-5 before:absolute before:top-6 before:bottom-6 before:left-3 before:w-px before:bg-gradient-to-b before:from-cyan-200/30 before:via-white/10 before:to-transparent">
+        <ol className="relative space-y-5 before:absolute before:top-6 before:bottom-6 before:left-3 before:w-px before:bg-gradient-to-b before:from-cyan-200/30 before:via-white/10 before:to-transparent">
           {resolvedExperienceData.experiences.map((experience) => (
-            <ExperienceCard
-              key={`${experience.role}-${experience.period}`}
-              experience={experience}
-            />
+            <li key={`${experience.role}-${experience.period}`}>
+              <ExperienceCard experience={experience} />
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );

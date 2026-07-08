@@ -25,7 +25,10 @@ export function ArchitectureNotes({
             <summary className="cursor-pointer list-none text-sm font-semibold text-neutral-200 transition group-open:text-white">
               <span className="flex items-center justify-between gap-4">
                 {section.title}
-                <span className="text-xs font-medium text-neutral-500 group-open:text-cyan-200/70">
+                <span
+                  aria-hidden="true"
+                  className="text-xs font-medium text-neutral-500 group-open:text-cyan-200/70"
+                >
                   <span className="group-open:hidden">View details</span>
                   <span className="hidden group-open:inline">Hide details</span>
                 </span>

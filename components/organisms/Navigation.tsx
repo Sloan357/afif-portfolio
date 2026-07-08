@@ -24,6 +24,7 @@ export function Navigation({ locale, navigationData }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
+  const mobileMenuId = `mobile-navigation-${locale}`;
 
   useEffect(() => {
     const homepagePath = `/${locale}`;
@@ -159,7 +160,7 @@ export function Navigation({ locale, navigationData }: NavigationProps) {
         <div className="flex items-center justify-between gap-6">
           <a
             href={localizedPath(locale, resolvedNavigationData.logo.href)}
-            className="inline-flex items-center gap-3 text-sm font-semibold tracking-tight text-white"
+            className="inline-flex items-center gap-3 text-sm font-semibold tracking-tight text-white focus-visible:ring-2 focus-visible:ring-cyan-200/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050608] focus-visible:outline-none"
             onClick={() => setIsMenuOpen(false)}
           >
             <span className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-[#050608] text-xs shadow-lg shadow-black/20">
@@ -182,12 +183,16 @@ export function Navigation({ locale, navigationData }: NavigationProps) {
 
           <MenuToggle
             isOpen={isMenuOpen}
+            controlsId={mobileMenuId}
             onClick={() => setIsMenuOpen((current) => !current)}
           />
         </div>
 
         {isMenuOpen ? (
-          <div className="mt-4 border-t border-white/10 px-2 pt-5 pb-4 md:hidden">
+          <div
+            id={mobileMenuId}
+            className="mt-4 border-t border-white/10 px-2 pt-5 pb-4 md:hidden"
+          >
             <div className="flex flex-col gap-5">
               <NavLinks
                 links={resolvedNavigationData.links}

@@ -40,16 +40,16 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
             </p>
           </div>
 
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <ul className="mt-3 grid gap-3 sm:grid-cols-2">
             {experience.responsibilities.map((responsibility) => (
-              <div
+              <li
                 key={responsibility}
                 className="rounded-xl border border-white/10 bg-white/[0.025] px-4 py-3 text-sm leading-6 text-neutral-300"
               >
                 {responsibility}
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
 
           <div className="mt-6">
             <p className="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase">
@@ -57,11 +57,13 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
             </p>
           </div>
 
-          <div className="mt-3 flex flex-wrap gap-2">
+          <ul className="mt-3 flex flex-wrap gap-2">
             {experience.technologies.map((technology) => (
-              <TechTag key={technology} label={technology} />
+              <li key={technology}>
+                <TechTag label={technology} />
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </div>
     </article>

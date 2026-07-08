@@ -29,11 +29,13 @@ export function Labs({ locale, labsData }: LabsProps) {
         </p>
       </div>
 
-      <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <ul className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {resolvedLabsData.labs.map((lab) => (
-          <LabCard key={lab.slug} lab={lab} />
+          <li key={lab.slug}>
+            <LabCard lab={lab} />
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }

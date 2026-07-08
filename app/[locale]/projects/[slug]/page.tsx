@@ -140,16 +140,21 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   }
 
   return (
-    <main lang={locale} className="min-h-screen bg-[#050608] text-white">
+    <>
       <StructuredData data={createProjectJsonLd(project, locale)} />
       <Navigation locale={locale} />
-      <section className="relative isolate mx-auto max-w-7xl overflow-hidden px-6 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24 xl:max-w-[88rem]">
+      <main
+        id="main-content"
+        lang={locale}
+        className="min-h-screen bg-[#050608] text-white"
+      >
+        <section className="relative isolate mx-auto max-w-7xl overflow-hidden px-6 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24 xl:max-w-[88rem]">
         <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_18%_18%,rgba(14,165,233,0.12),transparent_28%),radial-gradient(circle_at_82%_24%,rgba(34,197,94,0.1),transparent_24%),linear-gradient(180deg,#050608_0%,#09090b_50%,#050608_100%)]" />
         <div className="absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
         <Link
           href={`/${locale}#projects`}
-          className="inline-flex text-sm font-semibold text-neutral-300 underline-offset-4 transition hover:text-cyan-200 hover:underline"
+          className="inline-flex text-sm font-semibold text-neutral-300 underline-offset-4 transition hover:text-cyan-200 hover:underline focus-visible:ring-2 focus-visible:ring-cyan-200/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050608] focus-visible:outline-none"
         >
           Back to Projects
         </Link>
@@ -169,11 +174,13 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               {project.description}
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-2">
+            <ul className="mt-8 flex flex-wrap gap-2">
               {project.stack.map((technology) => (
-                <TechTag key={technology} label={technology} />
+                <li key={technology}>
+                  <TechTag label={technology} />
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
 
           <aside className="rounded-2xl border border-white/10 bg-[#08090d]/80 p-6 shadow-2xl shadow-black/30 backdrop-blur">
@@ -192,19 +199,23 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 <p className="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase">
                   Links
                 </p>
-                <div className="mt-3 flex flex-wrap gap-3">
+                <ul className="mt-3 flex flex-wrap gap-3">
                   {project.externalLinks.map((link) => (
-                    <a
-                      key={link.href}
-                      href={link.href}
-                      target={link.isExternal ? "_blank" : undefined}
-                      rel={link.isExternal ? "noreferrer" : undefined}
-                      className="inline-flex text-sm font-semibold text-white underline-offset-4 transition hover:text-cyan-200 hover:underline"
-                    >
-                      {link.label}
-                    </a>
+                    <li key={link.href}>
+                      <a
+                        href={link.href}
+                        target={link.isExternal ? "_blank" : undefined}
+                        rel={link.isExternal ? "noreferrer" : undefined}
+                        className="inline-flex text-sm font-semibold text-white underline-offset-4 transition hover:text-cyan-200 hover:underline focus-visible:ring-2 focus-visible:ring-cyan-200/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050608] focus-visible:outline-none"
+                      >
+                        {link.label}
+                        {link.isExternal ? (
+                          <span className="sr-only"> Opens in a new tab</span>
+                        ) : null}
+                      </a>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
             ) : null}
           </aside>
@@ -216,10 +227,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <DetailList title="Outcomes" items={project.outcomes} />
         </div>
 
-        <div className="mt-4">
-          <Gallery project={project} />
-        </div>
-      </section>
-    </main>
+          <div className="mt-4">
+            <Gallery project={project} />
+          </div>
+        </section>
+      </main>
+    </>
   );
 }

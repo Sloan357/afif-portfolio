@@ -19,7 +19,7 @@ export function LanguageSwitcher({
   const pathname = usePathname();
 
   return (
-    <div
+    <nav
       className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.035] p-1"
       aria-label="Language selector"
     >
@@ -32,7 +32,7 @@ export function LanguageSwitcher({
             href={switchLocalePath(pathname, option)}
             onClick={onNavigate}
             aria-current={isActive ? "page" : undefined}
-            className={`rounded-full px-2.5 py-1 text-[0.7rem] font-semibold tracking-[0.16em] uppercase transition ${
+            className={`rounded-full px-2.5 py-1 text-[0.7rem] font-semibold tracking-[0.16em] uppercase transition focus-visible:ring-2 focus-visible:ring-cyan-200/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050608] focus-visible:outline-none ${
               isActive
                 ? "bg-white text-neutral-950"
                 : "text-neutral-500 hover:text-white"
@@ -42,6 +42,6 @@ export function LanguageSwitcher({
           </a>
         );
       })}
-    </div>
+    </nav>
   );
 }

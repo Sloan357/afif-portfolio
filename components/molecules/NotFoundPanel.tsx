@@ -34,7 +34,7 @@ export function NotFoundPanel() {
   const content = notFoundContent[locale];
 
   return (
-    <main lang={locale} className="min-h-screen bg-[#050608] text-white">
+    <main id="main-content" lang={locale} className="min-h-screen bg-[#050608] text-white">
       <section className="relative isolate mx-auto flex min-h-screen max-w-7xl items-center overflow-hidden px-6 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24">
         <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_18%_22%,rgba(34,197,94,0.12),transparent_28%),radial-gradient(circle_at_78%_30%,rgba(14,165,233,0.12),transparent_26%),linear-gradient(180deg,#050608_0%,#09090b_48%,#050608_100%)]" />
         <div className="absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
@@ -52,13 +52,13 @@ export function NotFoundPanel() {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <a
               href={`/${locale}`}
-              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-neutral-950 transition hover:bg-neutral-200"
+              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-neutral-950 transition hover:bg-neutral-200 focus-visible:ring-2 focus-visible:ring-cyan-200/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050608] focus-visible:outline-none"
             >
               {content.homeLabel}
             </a>
             <a
               href={`/${locale}#projects`}
-              className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/[0.035] px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:border-white/25 hover:bg-white/[0.07]"
+              className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/[0.035] px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:border-white/25 hover:bg-white/[0.07] focus-visible:ring-2 focus-visible:ring-cyan-200/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050608] focus-visible:outline-none"
             >
               {content.projectsLabel}
             </a>

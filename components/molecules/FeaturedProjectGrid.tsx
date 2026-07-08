@@ -55,32 +55,36 @@ export function FeaturedProjectGrid({
 
   return (
     <>
-      <div className="mt-10 flex flex-wrap gap-2">
+      <ul className="mt-10 flex flex-wrap gap-2" aria-label="Project filters">
         {filters.map((filter) => {
           const isActive = filter === activeFilter;
 
           return (
-            <button
-              key={filter}
-              type="button"
-              onClick={() => setActiveFilter(filter)}
-              className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+            <li key={filter}>
+              <button
+                type="button"
+                aria-pressed={isActive}
+                onClick={() => setActiveFilter(filter)}
+                className={`rounded-full border px-4 py-2 text-sm font-medium transition focus-visible:ring-2 focus-visible:ring-cyan-200/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050608] focus-visible:outline-none ${
                 isActive
                   ? "border-white/20 bg-white text-neutral-950"
                   : "border-white/10 bg-white/[0.035] text-neutral-300 hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
               }`}
-            >
-              {categoryLabels[filter] ?? filter}
-            </button>
+              >
+                {categoryLabels[filter] ?? filter}
+              </button>
+            </li>
           );
         })}
-      </div>
+      </ul>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <ul className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {filteredProjects.map((project) => (
-          <ProjectCard key={project.title} project={project} locale={locale} />
+          <li key={project.title}>
+            <ProjectCard project={project} locale={locale} />
+          </li>
         ))}
-      </div>
+      </ul>
     </>
   );
 }

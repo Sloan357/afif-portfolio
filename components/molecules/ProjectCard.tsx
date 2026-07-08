@@ -30,11 +30,13 @@ export function ProjectCard({ project, locale }: ProjectCardProps) {
           </p>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-2">
+        <ul className="mt-6 flex flex-wrap gap-2">
           {project.stack.map((technology) => (
-            <TechTag key={technology} label={technology} />
+            <li key={technology}>
+              <TechTag label={technology} />
+            </li>
           ))}
-        </div>
+        </ul>
 
         <div className="mt-8 border-t border-white/10 pt-5">
           <TextLink href={localizedPath(locale, project.cta.href)}>
