@@ -1,4 +1,10 @@
-import type { ArchitectureNoteSection, CmsImage, CmsLink } from "@/data/types";
+import type {
+  ArchitectureNoteSection,
+  CmsImage,
+  CmsLink,
+  SeoData,
+  TechnologyItem,
+} from "@/data/types";
 import { resolveLocalizedContent, type LocalizedContent } from "@/i18n/content";
 import type { Locale } from "@/i18n/routing";
 
@@ -6,17 +12,39 @@ export type ProjectImage = CmsImage;
 export type ProjectExternalLink = CmsLink;
 export type ProjectCta = Pick<CmsLink, "label" | "href">;
 
+export type RepositoryVisibility = "public" | "private" | "nda" | "unknown";
+
+export type CaseStudySection = {
+  title: string;
+  eyebrow?: string;
+  summary?: string;
+  content?: string;
+  items?: string[];
+  sortOrder?: number;
+};
+
 export type FeaturedProject = {
   slug: string;
   title: string;
   subtitle: string;
+  summary?: string;
   description: string;
+  content?: string;
   type: string;
+  industry?: string;
+  timeline?: string;
+  teamSize?: string;
+  repositoryVisibility?: RepositoryVisibility;
   categories: string[];
   coverImage: ProjectImage | null;
   galleryImages: ProjectImage[];
   stack: string[];
+  technologies?: TechnologyItem[];
   role: string;
+  engineeringHighlights?: string[];
+  caseStudySections?: CaseStudySection[];
+  architectureDiagram?: ProjectImage | null;
+  seo?: SeoData | null;
   architectureNotes: ArchitectureNoteSection[];
   challenges: string[];
   outcomes: string[];

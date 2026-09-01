@@ -11,7 +11,7 @@ import {
   type FeaturedProjectsData,
 } from "@/data/projects";
 import { getSeoData } from "@/data/seo";
-import type { CmsLink } from "@/data/types";
+import type { CmsLink, SeoData, TechnologyItem } from "@/data/types";
 import type {
   CmsExperienceData,
   CmsExperiencePayload,
@@ -1157,6 +1157,172 @@ function normalizeImages(value: unknown) {
   return value.map(normalizeImage).filter((image) => image !== null);
 }
 
+function normalizeRepositoryVisibility(value: unknown) {
+  if (typeof value !== "string") {
+    return "unknown" as const;
+  }
+
+  const normalizedValue = value.toLowerCase().replace(/[\s_-]+/g, "-");
+
+  if (normalizedValue === "public") {
+    return "public" as const;
+  }
+
+  if (normalizedValue === "private") {
+    return "private" as const;
+  }
+
+  if (normalizedValue === "nda") {
+    return "nda" as const;
+  }
+
+  return "unknown" as const;
+}
+
+function normalizeTechnologyItems(value: unknown): TechnologyItem[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((technology) => {
+    if (typeof technology === "string") {
+      return [{ label: technology }];
+    }
+
+    if (!isRecord(technology)) {
+      return [];
+    }
+
+    const label = readFirstStringField(technology, ["label", "name", "title"]);
+
+    if (!label) {
+      return [];
+    }
+
+    const slug = readFirstStringField(technology, ["slug", "key"]);
+    const icon = readFirstStringField(technology, ["icon", "abbr"]);
+    const category = readFirstStringField(technology, ["category", "type"]);
+
+    return [
+      {
+        label,
+        ...(slug ? { slug } : {}),
+        ...(icon ? { icon } : {}),
+        ...(category ? { category } : {}),
+      },
+    ];
+  });
+}
+
+function normalizeCaseStudySections(value: unknown) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .flatMap((section, index) => {
+      if (!isRecord(section)) {
+        return [];
+      }
+
+      const title = readFirstStringField(section, [
+        "title",
+        "heading",
+        "label",
+        "type",
+      ]);
+
+      if (!title) {
+        return [];
+      }
+
+      const eyebrow = readFirstStringField(section, ["eyebrow", "kicker"]);
+      const summary = readFirstStringField(section, [
+        "summary",
+        "description",
+        "excerpt",
+      ]);
+      const content = readFirstStringField(section, [
+        "content",
+        "body",
+        "text",
+      ]);
+      const items = toStringArray(
+        readFirstCmsField(section, ["items", "bullets", "points"]),
+      );
+      const sortOrder = readCmsField(section, "sortOrder").value;
+
+      if (!summary && !content && items.length === 0) {
+        return [];
+      }
+
+      return [
+        {
+          title,
+          ...(eyebrow ? { eyebrow } : {}),
+          ...(summary ? { summary } : {}),
+          ...(content ? { content } : {}),
+          ...(items.length > 0 ? { items } : {}),
+          sortOrder: typeof sortOrder === "number" ? sortOrder : index,
+        },
+      ];
+    })
+    .sort((first, second) => (first.sortOrder ?? 0) - (second.sortOrder ?? 0));
+}
+
+function normalizeSeoData(value: unknown): SeoData | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const metaTitle = readFirstStringField(value, [
+    "metaTitle",
+    "title",
+    "seoTitle",
+  ]);
+  const metaDescription = readFirstStringField(value, [
+    "metaDescription",
+    "description",
+    "seoDescription",
+  ]);
+  const canonicalUrl = readFirstStringField(value, ["canonicalUrl", "canonical"]);
+  const ogTitle = readFirstStringField(value, ["ogTitle", "openGraphTitle"]);
+  const ogDescription = readFirstStringField(value, [
+    "ogDescription",
+    "openGraphDescription",
+  ]);
+  const twitterTitle = readFirstStringField(value, ["twitterTitle", "xTitle"]);
+  const twitterDescription = readFirstStringField(value, [
+    "twitterDescription",
+    "xDescription",
+  ]);
+  const ogImage = normalizeImage(
+    readFirstCmsField(value, ["ogImage", "openGraphImage", "image"]),
+  );
+  const twitterImage = normalizeImage(
+    readFirstCmsField(value, ["twitterImage", "xImage"]),
+  );
+  const noIndex = readCmsField(value, "noIndex").value;
+
+  if (!metaTitle && !metaDescription && !ogTitle && !ogDescription) {
+    return null;
+  }
+
+  return {
+    metaTitle: metaTitle ?? "",
+    metaDescription: metaDescription ?? "",
+    canonicalUrl: canonicalUrl ?? "",
+    ogTitle: ogTitle ?? metaTitle ?? "",
+    ogDescription: ogDescription ?? metaDescription ?? "",
+    ogImage: ogImage?.src ?? null,
+    twitterTitle: twitterTitle ?? ogTitle ?? metaTitle ?? "",
+    twitterDescription:
+      twitterDescription ?? ogDescription ?? metaDescription ?? "",
+    twitterImage: twitterImage?.src ?? ogImage?.src ?? null,
+    noIndex: typeof noIndex === "boolean" ? noIndex : false,
+  };
+}
+
 function normalizeArchitectureNotes(value: unknown) {
   if (!Array.isArray(value)) {
     return [];
@@ -1234,13 +1400,26 @@ function normalizeProjectShape(project: FeaturedProject, fallbackSlug: string) {
     slug,
     title: project.title || slug,
     subtitle: project.subtitle || "",
+    summary: project.summary || "",
     description: project.description || "",
+    content: project.content || "",
     type: project.type || "Project",
+    industry: project.industry || "",
+    timeline: project.timeline || "",
+    teamSize: project.teamSize || "",
+    repositoryVisibility: normalizeRepositoryVisibility(
+      project.repositoryVisibility,
+    ),
     categories: toStringArray(project.categories),
     coverImage,
     galleryImages: normalizeImages(project.galleryImages),
     stack: toStringArray(project.stack),
+    technologies: normalizeTechnologyItems(project.technologies),
     role: project.role || "",
+    engineeringHighlights: toStringArray(project.engineeringHighlights),
+    caseStudySections: normalizeCaseStudySections(project.caseStudySections),
+    architectureDiagram: normalizeImage(project.architectureDiagram),
+    seo: normalizeSeoData(project.seo),
     architectureNotes: normalizeArchitectureNotes(project.architectureNotes),
     challenges: toStringArray(project.challenges),
     outcomes: toStringArray(project.outcomes),
@@ -1902,13 +2081,24 @@ function createEmptyProjectFallback(slug: string): FeaturedProject {
     slug,
     title: slug,
     subtitle: "",
+    summary: "",
     description: "",
+    content: "",
     type: "Project",
+    industry: "",
+    timeline: "",
+    teamSize: "",
+    repositoryVisibility: "unknown",
     categories: [],
     coverImage: null,
     galleryImages: [],
     stack: [],
+    technologies: [],
     role: "",
+    engineeringHighlights: [],
+    caseStudySections: [],
+    architectureDiagram: null,
+    seo: null,
     architectureNotes: [],
     challenges: [],
     outcomes: [],
@@ -1996,26 +2186,27 @@ function prepareCmsProjectPayload(
     "heading",
   ]);
   const subtitle = readFirstCmsString(preparedProject, [
-    "summary",
     "subtitle",
     "excerpt",
     "shortDescription",
     "projectSummary",
     "intro",
   ]);
-  const description = readFirstCmsString(preparedProject, [
-    "description",
+  const summary = readFirstCmsString(preparedProject, ["summary"]);
+  const description = readFirstCmsString(preparedProject, ["description"]);
+  const content = readFirstCmsString(preparedProject, [
     "content",
     "body",
     "details",
     "longDescription",
     "caseStudySummary",
-    "summary",
   ]);
-  const type = readFirstCmsString(preparedProject, [
-    "type",
-    "projectType",
-    "categoryLabel",
+  const type = readFirstCmsString(preparedProject, ["type", "projectType"]);
+  const industry = readFirstCmsString(preparedProject, ["industry"]);
+  const timeline = readFirstCmsString(preparedProject, ["timeline"]);
+  const teamSize = readFirstCmsString(preparedProject, ["teamSize"]);
+  const repositoryVisibility = readFirstCmsString(preparedProject, [
+    "repositoryVisibility",
   ]);
   const role = readFirstCmsString(preparedProject, ["role", "myRole"]);
   const categories = readFirstCmsArray(preparedProject, [
@@ -2023,11 +2214,18 @@ function prepareCmsProjectPayload(
     "tags",
     "filters",
   ]);
-  const stack = readFirstCmsArray(preparedProject, [
-    "stack",
-    "technologies",
-    "techStack",
+  const stack = readFirstCmsArray(preparedProject, ["stack", "techStack"]);
+  const technologies = readFirstCmsArray(preparedProject, ["technologies"]);
+  const engineeringHighlights = readFirstCmsArray(preparedProject, [
+    "engineeringHighlights",
   ]);
+  const caseStudySections = readFirstCmsArray(preparedProject, [
+    "caseStudySections",
+  ]);
+  const architectureDiagram = readFirstCmsField(preparedProject, [
+    "architectureDiagram",
+  ]);
+  const seo = readFirstCmsField(preparedProject, ["seo"]);
   const architectureNotes = readFirstCmsArray(preparedProject, [
     "architectureNotes",
     "architecture",
@@ -2059,8 +2257,32 @@ function prepareCmsProjectPayload(
     preparedProject.description = description;
   }
 
+  if (summary) {
+    preparedProject.summary = summary;
+  }
+
+  if (content) {
+    preparedProject.content = content;
+  }
+
   if (type) {
     preparedProject.type = type;
+  }
+
+  if (industry) {
+    preparedProject.industry = industry;
+  }
+
+  if (timeline) {
+    preparedProject.timeline = timeline;
+  }
+
+  if (teamSize) {
+    preparedProject.teamSize = teamSize;
+  }
+
+  if (repositoryVisibility) {
+    preparedProject.repositoryVisibility = repositoryVisibility;
   }
 
   if (role) {
@@ -2073,6 +2295,30 @@ function prepareCmsProjectPayload(
 
   if (stack) {
     preparedProject.stack = stack;
+  }
+
+  if (technologies) {
+    preparedProject.technologies = technologies;
+
+    if (!stack) {
+      preparedProject.stack = technologies;
+    }
+  }
+
+  if (engineeringHighlights) {
+    preparedProject.engineeringHighlights = engineeringHighlights;
+  }
+
+  if (caseStudySections) {
+    preparedProject.caseStudySections = caseStudySections;
+  }
+
+  if (architectureDiagram) {
+    preparedProject.architectureDiagram = architectureDiagram;
+  }
+
+  if (seo) {
+    preparedProject.seo = seo;
   }
 
   if (architectureNotes) {
@@ -2137,6 +2383,23 @@ function logProjectCoverImage(
   );
 }
 
+function withProjectContractDefaults(project: FeaturedProject): FeaturedProject {
+  return {
+    summary: "",
+    content: "",
+    industry: "",
+    timeline: "",
+    teamSize: "",
+    repositoryVisibility: "unknown",
+    technologies: [],
+    engineeringHighlights: [],
+    caseStudySections: [],
+    architectureDiagram: null,
+    seo: null,
+    ...project,
+  };
+}
+
 function getProjectFallback(
   cmsProject: CmsProjectPayload,
   staticProjects: FeaturedProject[],
@@ -2144,13 +2407,17 @@ function getProjectFallback(
 ) {
   if (typeof cmsProject.slug === "string") {
     return (
-      staticProjects.find((project) => project.slug === cmsProject.slug) ??
-      createEmptyProjectFallback(cmsProject.slug)
+      withProjectContractDefaults(
+        staticProjects.find((project) => project.slug === cmsProject.slug) ??
+          createEmptyProjectFallback(cmsProject.slug),
+      )
     );
   }
 
   return (
-    staticProjects[index] ?? createEmptyProjectFallback(`cms-project-${index}`)
+    withProjectContractDefaults(
+      staticProjects[index] ?? createEmptyProjectFallback(`cms-project-${index}`),
+    )
   );
 }
 
@@ -2240,7 +2507,9 @@ export function adaptCmsProject(
   const adaptedProject = normalizeProjectShape(
     mergeWithStaticShape(
       preparedProject,
-      staticProject ?? createEmptyProjectFallback(slug),
+      staticProject
+        ? withProjectContractDefaults(staticProject)
+        : createEmptyProjectFallback(slug),
       `projects.${slug}`,
       logger,
     ),
